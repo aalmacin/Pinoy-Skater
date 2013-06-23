@@ -41,8 +41,8 @@ class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
 
   def start_moving(self, *args, **kwargs):
     for layer in self.get_children():
-      if layer.x - 10 >= -600:
-        layer.x -= 10
+      if layer.x - (layer.parallax * 4) >= -600:
+        layer.x -= (layer.parallax * 4)
       else:
         layer.x = 0
 
