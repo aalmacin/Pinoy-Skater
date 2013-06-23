@@ -6,11 +6,11 @@ import cocos
 """
 class MainScene(cocos.scene.Scene):
   BG_IMGS = ["images/scrollingbgback.png", "images/scrollingbg.png", "images/scrollingbgfront.png", "images/scrollingbgfast.png"]
-  def __init__(self):
+  def __init__(self, director_window):
     super(MainScene, self).__init__()
 
     # Create an instance of the scroller
-    self.background_scroller = ParallaxScroller()
+    self.background_scroller = ParallaxScroller(director_window)
 
     # Call the method to set the background of the scene
     self.set_parallax_background()
@@ -27,17 +27,25 @@ class MainScene(cocos.scene.Scene):
     for i in range(0, len(MainScene.BG_IMGS)):
       scrollable_sprite = cocos.sprite.Sprite(MainScene.BG_IMGS[i], anchor=(0,0))
       scrollable_layer = cocos.layer.scrolling.ScrollableLayer(parallax=i)
+      scrollable_layer.px_width = 1200
+      scrollable_layer.px_height = 500
       scrollable_layer.add(scrollable_sprite)
       scrollable_layers.append(scrollable_layer)
 
     self.background_scroller.add_children(scrollable_layers)
 
 class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
-  def __init__(self):
-    super(ParallaxScroller, self).__init__()
+  def __init__(self, viewport=None):
+    super(ParallaxScroller, self).__init__(viewport)
+    self.schedule_interval(self.start_moving, 0.1)
 
-  def on_enter(self):
-    print "Hey"
+  def start_moving(self, *args, **kwargs):
+    for layer in self.get_children():
+      if layer.x - 10 >= -600:
+        layer.x -= 10
+      else:
+        layer.x = 0
+
 
   def add_children(self, layers):
     for layer in layers:
