@@ -35,17 +35,26 @@ class MainScene(cocos.scene.Scene):
     self.background_scroller.add_children(scrollable_layers)
 
 class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
+  PARALLAX_SPEED = 10
+  WIDTH = 1200
   def __init__(self, viewport=None):
     super(ParallaxScroller, self).__init__(viewport)
     self.schedule_interval(self.start_moving, 0.1)
+    self.current_x = self.viewport.width / 2
 
   def start_moving(self, *args, **kwargs):
+    print "------------"
     for layer in self.get_children():
-      if layer.x - (layer.parallax * 4) >= -600:
-        layer.x -= (layer.parallax * 4)
-      else:
-        layer.x = 0
+      print layer.x
+      if layer.x <= -ParallaxScroller.WIDTH:
+        layer.set_view(0, layer.y, 600, 500)
+        print "RESET"
 
+    if self.current_x + ParallaxScroller.PARALLAX_SPEED <= ParallaxScroller.WIDTH - (self.viewport.width / 2):
+      self.current_x += ParallaxScroller.PARALLAX_SPEED
+    else:
+      self.current_x = self.viewport.width / 2
+    self.set_focus(self.current_x, 0)
 
   def add_children(self, layers):
     for layer in layers:
