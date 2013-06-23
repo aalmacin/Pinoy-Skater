@@ -4,7 +4,7 @@ from scenes import MainScene
 # Start the game
 def main():
   # Initialize the director
-  cocos.director.director.init(width=512, height=384)
+  cocos.director.director.init(width=1024, height=500)
 
   # Create the main Scene
   main_scene = MainScene()
