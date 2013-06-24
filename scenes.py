@@ -43,12 +43,9 @@ class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
     self.current_x = self.viewport.width / 2
 
   def start_moving(self, *args, **kwargs):
-    print "------------"
     for layer in self.get_children():
-      print layer.x
       if layer.x <= -ParallaxScroller.WIDTH:
         layer.set_view(0, layer.y, 600, 500)
-        print "RESET"
 
     if self.current_x + ParallaxScroller.PARALLAX_SPEED <= ParallaxScroller.WIDTH - (self.viewport.width / 2):
       self.current_x += ParallaxScroller.PARALLAX_SPEED
