@@ -1,4 +1,6 @@
 import cocos
+from cocos.actions.interval_actions import Jump, RotateTo, Accelerate, MoveTo
+import time
 
 """
   name: MainScene
@@ -68,21 +70,35 @@ class GameLayer(cocos.layer.base_layers.Layer):
     super(GameLayer, self).__init__()
     self.size = (600, 200)
     self.hero = Hero()
-    self.hero.position = (10, 10)
     self.add(self.hero)
 
   def on_key_press(self, key, modifiers):
     if GameLayer.UP == key:
-      self.hero.jump()
+      self.hero.up()
     elif GameLayer.DOWN == key:
-      print "down"
+      self.hero.slide()
 
 class Hero(cocos.sprite.Sprite):
   IMAGE_NAME = "images/katipunero.png"
   def __init__(self):
     super(Hero, self).__init__(Hero.IMAGE_NAME, anchor=(0, 0))
+    self.sliding = False
+    self.position = (10, 10)
 
-  def jump(self):
+  def up(self):
     if self.y == 10:
-      jump = cocos.actions.interval_actions.Jump(x=0, y=100, duration=1)
-      self.do(jump)
+      if self.sliding:
+        back = RotateTo(0, 0.1)
+        move = MoveTo((10, 10), 0.1)
+        self.do(back | move)
+        self.sliding = False
+      else:
+        jump = Jump(x=0, y=100, duration=1)
+        self.do(jump)
+
+
+  def slide(self):
+    slide = Accelerate(RotateTo(-90,0.1))
+    move = Accelerate(MoveTo((self.height, 10),0.1))
+    self.do(slide | move)
+    self.sliding = True
