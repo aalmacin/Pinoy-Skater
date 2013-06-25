@@ -15,7 +15,10 @@ class MainScene(cocos.scene.Scene):
     # Call the method to set the background of the scene
     self.set_parallax_background()
 
-    self.add(self.background_scroller)
+    self.game_layer = GameLayer()
+
+    self.add(self.background_scroller, z=1)
+    self.add(self.game_layer, z=2)
 
   """
     name: set background
@@ -56,3 +59,16 @@ class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
   def add_children(self, layers):
     for layer in layers:
       self.add(layer)
+
+class GameLayer(cocos.layer.base_layers.Layer):
+  def __init__(self):
+    super(GameLayer, self).__init__()
+    self.size = (600, 200)
+    self.hero = Hero()
+    self.hero.position = (10, 10)
+    self.add(self.hero)
+
+class Hero(cocos.sprite.Sprite):
+  IMAGE_NAME = "images/katipunero.png"
+  def __init__(self):
+    super(Hero, self).__init__(Hero.IMAGE_NAME, anchor=(0, 0))
