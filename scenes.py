@@ -61,6 +61,9 @@ class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
       self.add(layer)
 
 class GameLayer(cocos.layer.base_layers.Layer):
+  UP = 119
+  DOWN = 115
+  is_event_handler = True
   def __init__(self):
     super(GameLayer, self).__init__()
     self.size = (600, 200)
@@ -68,7 +71,17 @@ class GameLayer(cocos.layer.base_layers.Layer):
     self.hero.position = (10, 10)
     self.add(self.hero)
 
+  def on_key_press(self, key, modifiers):
+    if GameLayer.UP == key:
+      self.hero.jump()
+    elif GameLayer.DOWN == key:
+      print "down"
+
 class Hero(cocos.sprite.Sprite):
   IMAGE_NAME = "images/katipunero.png"
   def __init__(self):
     super(Hero, self).__init__(Hero.IMAGE_NAME, anchor=(0, 0))
+
+  def jump(self):
+    jump = cocos.actions.interval_actions.Jump(x=0, y=100, duration=1)
+    self.do(jump)
