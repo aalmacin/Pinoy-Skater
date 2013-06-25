@@ -83,5 +83,6 @@ class Hero(cocos.sprite.Sprite):
     super(Hero, self).__init__(Hero.IMAGE_NAME, anchor=(0, 0))
 
   def jump(self):
-    jump = cocos.actions.interval_actions.Jump(x=0, y=100, duration=1)
-    self.do(jump)
+    if self.y == 10:
+      jump = cocos.actions.interval_actions.Jump(x=0, y=100, duration=1)
+      self.do(jump)
