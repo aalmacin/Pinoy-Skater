@@ -78,9 +78,9 @@ class GameLayer(cocos.layer.base_layers.Layer):
 
   def on_key_press(self, key, modifiers):
     if GameLayer.UP == key:
-      self.hero.jump()
+      self.hero.hero_action(Hero.JUMPING)
     elif GameLayer.DOWN == key:
-      self.hero.slide()
+      self.hero.hero_action(Hero.SLIDING)
 
 class Hero(cocos.cocosnode.CocosNode):
   IMAGE_RUN1 = "images/katipunero.png"
@@ -138,12 +138,6 @@ class Hero(cocos.cocosnode.CocosNode):
 
       self.do(delay + state_change)
       self.hero_running_1.do(delay + hide_and_show)
-
-  def jump(self):
-    self.hero_action(Hero.JUMPING)
-
-  def slide(self):
-    self.hero_action(Hero.SLIDING)
 
   def animate_running(self, *args, **kwargs):
     if not self.sliding and not self.jumping:
