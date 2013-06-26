@@ -83,52 +83,62 @@ class Hero(cocos.cocosnode.CocosNode):
   IMAGE_RUN1 = "images/katipunero.png"
   IMAGE_RUN2 = "images/katipunero_run.png"
   SLIDE_NAME = "images/katipunero_slide.png"
+  JUMP_NAME = "images/katipunero_jump.png"
+  JUMPING = "Jumping"
+  SLIDING = "Sliding"
+
   def __init__(self):
     super(Hero, self).__init__()
     self.hero_running_1 = Sprite(Hero.IMAGE_RUN1)
     self.hero_running_2 = Sprite(Hero.IMAGE_RUN2)
     self.hero_slide = Sprite(Hero.SLIDE_NAME)
+    self.hero_jump = Sprite(Hero.JUMP_NAME)
 
     self.add(self.hero_slide)
     self.add(self.hero_running_1)
     self.add(self.hero_running_2)
+    self.add(self.hero_jump)
 
     self.hero_running_2.visible = False
     self.hero_slide.visible = False
+    self.hero_jump.visible = False
     self.sliding = False
     self.jumping = False
     self.position = (100, 100)
 
     self.schedule_interval(self.animate_running, .3)
 
-  def jump(self):
-    if self.y == 100 and not self.sliding:
-      self.jumping = True
-      jump = Jump(x=0, y=100, duration=0.5)
-      self.do(jump)
-
-      delay = Delay(0.5)
-      jumping_change = Lerp("jumping", self.jumping, not self.jumping, 0.5)
-
-      self.do(delay + jumping_change)
-
-  def slide(self):
-    if not self.sliding and not self.jumping:
-      self.sliding = True
+  def hero_action(self, action_type):
+    if not self.jumping and not self.sliding:
       self.hero_running_1.visible = False
       self.hero_running_2.visible = False
+
+      delay = Delay(0.5)
 
       hide_and_show = Lerp("visible", False, True, 0.5)
       show_and_hide = Lerp("visible", True, False, 0.5)
 
-      self.hero_slide.do(show_and_hide)
-      delay = Delay(0.5)
-      sliding_change = Lerp("sliding", self.sliding, not self.sliding, 0.5)
+      if action_type == Hero.JUMPING:
+        self.jumping = True
+        jump = Jump(x=0, y=100, duration=0.5)
+        self.do(jump)
+        state_change = Lerp("jumping", self.jumping, not self.jumping, 0.5)
+        self.hero_jump.do(show_and_hide)
+      elif action_type == Hero.SLIDING:
+        self.sliding = True
+        state_change = Lerp("sliding", self.sliding, not self.sliding, 0.5)
+        self.hero_slide.do(show_and_hide)
 
-      self.do(delay + sliding_change)
+      self.do(delay + state_change)
       self.hero_running_1.do(delay + hide_and_show)
 
+  def jump(self):
+    self.hero_action(Hero.JUMPING)
+
+  def slide(self):
+    self.hero_action(Hero.SLIDING)
+
   def animate_running(self, *args, **kwargs):
-    if not self.sliding:
+    if not self.sliding and not self.jumping:
       self.hero_running_1.visible = not self.hero_running_1.visible
       self.hero_running_2.visible = not self.hero_running_2.visible
