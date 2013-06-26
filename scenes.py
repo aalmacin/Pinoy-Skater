@@ -1,5 +1,6 @@
 import cocos
-from cocos.actions.interval_actions import Jump, RotateTo, Accelerate, MoveTo
+from cocos.actions.interval_actions import *
+from cocos.sprite import *
 import time
 
 """
@@ -30,7 +31,7 @@ class MainScene(cocos.scene.Scene):
     # Create the background image
     scrollable_layers = []
     for i in range(0, len(MainScene.BG_IMGS)):
-      scrollable_sprite = cocos.sprite.Sprite(MainScene.BG_IMGS[i], anchor=(0,0))
+      scrollable_sprite = Sprite(MainScene.BG_IMGS[i], anchor=(0,0))
       scrollable_layer = cocos.layer.scrolling.ScrollableLayer(parallax=i)
       scrollable_layer.px_width = 1200
       scrollable_layer.px_height = 500
@@ -74,31 +75,60 @@ class GameLayer(cocos.layer.base_layers.Layer):
 
   def on_key_press(self, key, modifiers):
     if GameLayer.UP == key:
-      self.hero.up()
+      self.hero.jump()
     elif GameLayer.DOWN == key:
       self.hero.slide()
 
-class Hero(cocos.sprite.Sprite):
-  IMAGE_NAME = "images/katipunero.png"
+class Hero(cocos.cocosnode.CocosNode):
+  IMAGE_RUN1 = "images/katipunero.png"
+  IMAGE_RUN2 = "images/katipunero_run.png"
+  SLIDE_NAME = "images/katipunero_slide.png"
   def __init__(self):
-    super(Hero, self).__init__(Hero.IMAGE_NAME, anchor=(0, 0))
+    super(Hero, self).__init__()
+    self.hero_running_1 = Sprite(Hero.IMAGE_RUN1)
+    self.hero_running_2 = Sprite(Hero.IMAGE_RUN2)
+    self.hero_slide = Sprite(Hero.SLIDE_NAME)
+
+    self.add(self.hero_slide)
+    self.add(self.hero_running_1)
+    self.add(self.hero_running_2)
+
+    self.hero_running_2.visible = False
+    self.hero_slide.visible = False
     self.sliding = False
-    self.position = (10, 10)
+    self.jumping = False
+    self.position = (100, 100)
 
-  def up(self):
-    if self.y == 10:
-      if self.sliding:
-        back = RotateTo(0, 0.1)
-        move = MoveTo((10, 10), 0.1)
-        self.do(back | move)
-        self.sliding = False
-      else:
-        jump = Jump(x=0, y=100, duration=1)
-        self.do(jump)
+    self.schedule_interval(self.animate_running, .3)
 
+  def jump(self):
+    if self.y == 100 and not self.sliding:
+      self.jumping = True
+      jump = Jump(x=0, y=100, duration=0.5)
+      self.do(jump)
+
+      delay = Delay(0.5)
+      jumping_change = Lerp("jumping", self.jumping, not self.jumping, 0.5)
+
+      self.do(delay + jumping_change)
 
   def slide(self):
-    slide = Accelerate(RotateTo(-90,0.1))
-    move = Accelerate(MoveTo((self.height, 10),0.1))
-    self.do(slide | move)
-    self.sliding = True
+    if not self.sliding and not self.jumping:
+      self.sliding = True
+      self.hero_running_1.visible = False
+      self.hero_running_2.visible = False
+
+      hide_and_show = Lerp("visible", False, True, 0.5)
+      show_and_hide = Lerp("visible", True, False, 0.5)
+
+      self.hero_slide.do(show_and_hide)
+      delay = Delay(0.5)
+      sliding_change = Lerp("sliding", self.sliding, not self.sliding, 0.5)
+
+      self.do(delay + sliding_change)
+      self.hero_running_1.do(delay + hide_and_show)
+
+  def animate_running(self, *args, **kwargs):
+    if not self.sliding:
+      self.hero_running_1.visible = not self.hero_running_1.visible
+      self.hero_running_2.visible = not self.hero_running_2.visible
