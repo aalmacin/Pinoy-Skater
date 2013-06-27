@@ -13,45 +13,46 @@ class GameScene(Scene):
     self.add(moving_bg)
 
 class MovingBackground(Layer):
-  BG_IMGS = [
-              "images/NonMovingBG.png",
-              "images/Ulap.png",
-              "images/Mountains.png",
-              "images/FastMovingBG.png"
-            ]
   def __init__(self):
     super(MovingBackground, self).__init__()
     self.non_moving_bg = Sprite("images/NonMovingBG.png", anchor=(0,0))
-    self.clouds = Sprite("images/Ulap.png", anchor=(0,0))
+
+    self.clouds = [
+        Sprite("images/clouds_01.png", anchor=(0,0)),
+        Sprite("images/clouds_02.png", anchor=(0,0))
+    ]
 
     self.mountains = [
         Sprite("images/Mountains_01.png", anchor=(0,0)),
         Sprite("images/Mountains_02.png", anchor=(0,0))
     ]
 
+    self.road = [
+        Sprite("images/Road_01.png", anchor=(0,0)),
+        Sprite("images/Road_02.png", anchor=(0,0))
+    ]
+
+    self.parallax_bgs = [self.clouds, self.mountains, self.road]
+    self.parallax_speed = [5, 10, 15]
+
     self.positions = [0, GameScene.WIDTH]
-    self.fast_moving_bg = Sprite("images/FastMovingBG.png", anchor=(0,0))
 
     self.add(self.non_moving_bg)
-    self.add(self.clouds)
 
-    for i in range(0, len(self.mountains)):
-      mountain = self.mountains[i]
-      mountain.x = self.positions[i]
-      self.add(mountain)
-
-
-    self.add(self.fast_moving_bg)
+    for bg in self.parallax_bgs:
+      for i in range(0, len(bg)):
+        bg_img = bg[i]
+        bg_img.x = self.positions[i]
+        self.add(bg_img)
 
     self.interval = 0.1
 
     self.schedule_interval(self.move, self.interval)
 
   def move(self, *args, **kwargs):
-    #self.clouds.x -= 5
-
-    for mountain in self.mountains:
-      mountain.x -= 10
-      if mountain.x == -GameScene.WIDTH:
-        mountain.x = GameScene.WIDTH
-    #self.fast_moving_bg.x -= 15
+    for parallax_obj in self.parallax_bgs:
+      for i in range(0, len(self.parallax_speed)):
+        for sprite in parallax_obj:
+          sprite.x -= self.parallax_speed[i]
+          if sprite.x == -GameScene.WIDTH:
+            sprite.x = GameScene.WIDTH
