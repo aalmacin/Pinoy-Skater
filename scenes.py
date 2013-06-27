@@ -125,3 +125,18 @@ class Skater(CocosNode):
     if not self.performing:
       self.skater_main.do(Show())
       self.skater_sit.do(Hide())
+
+class HittableObj(CocosNode):
+  def __init__(self, image_name, pos):
+    super(HittableObj, self).__init__()
+    self.sprite = Sprite(image_name, anchor=(0,0))
+    self.sprite.position = pos
+
+class Obstacle(HittableObj):
+  def __init__(self, image_name, pos):
+    super(Obstacle, self).__init__(image_name, pos)
+
+
+class Item(HittableObj):
+  def __init__(self, image_name):
+    super(Item, self).__init__(image_name, pos)
