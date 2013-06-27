@@ -4,15 +4,20 @@ from cocos.sprite import *
 import time
 
 """
-  name: MainScene
+  name: GameScene
   desc: The main screen to be shown when the game is loaded.
 """
-class MainScene(cocos.scene.Scene):
-  BG_IMGS = ["images/scrollingbgback.png", "images/scrollingbg.png", "images/scrollingbgfront.png", "images/scrollingbgfast.png"]
-  WIDTH = 1200
-  HEIGHT = 500
+class GameScene(cocos.scene.Scene):
+  BG_IMGS = [
+              "images/NonMovingBG.png",
+              "images/Ulap.png",
+              "images/Mountains.png",
+              "images/FastMovingBG.png"
+            ]
+  WIDTH = 2400
+  HEIGHT = 700
   def __init__(self, director_window):
-    super(MainScene, self).__init__()
+    super(GameScene, self).__init__()
 
     # Create an instance of the scroller
     self.background_scroller = ParallaxScroller(director_window)
@@ -32,11 +37,11 @@ class MainScene(cocos.scene.Scene):
   def set_parallax_background(self):
     # Create the background image
     scrollable_layers = []
-    for i in range(0, len(MainScene.BG_IMGS)):
-      scrollable_sprite = Sprite(MainScene.BG_IMGS[i], anchor=(0,0))
+    for i in range(0, len(GameScene.BG_IMGS)):
+      scrollable_sprite = Sprite(GameScene.BG_IMGS[i], anchor=(0,0))
       scrollable_layer = cocos.layer.scrolling.ScrollableLayer(parallax=i)
-      scrollable_layer.px_width = MainScene.WIDTH
-      scrollable_layer.px_height = MainScene.HEIGHT
+      scrollable_layer.px_width = GameScene.WIDTH
+      scrollable_layer.px_height = GameScene.HEIGHT
       scrollable_layer.add(scrollable_sprite)
       scrollable_layers.append(scrollable_layer)
 
@@ -52,10 +57,10 @@ class ParallaxScroller(cocos.layer.scrolling.ScrollingManager):
 
   def start_moving(self, *args, **kwargs):
     for layer in self.get_children():
-      if layer.x <= -MainScene.WIDTH:
-        layer.set_view(0, layer.y, MainScene.WIDTH / 2, MainScene.HEIGHT)
+      if layer.x <= -GameScene.WIDTH:
+        layer.set_view(0, layer.y, GameScene.WIDTH / 2, GameScene.HEIGHT)
 
-    if self.current_x + ParallaxScroller.PARALLAX_SPEED <= MainScene.WIDTH - (self.viewport.width / 2):
+    if self.current_x + ParallaxScroller.PARALLAX_SPEED <= GameScene.WIDTH - (self.viewport.width / 2):
       self.current_x += ParallaxScroller.PARALLAX_SPEED
     else:
       self.current_x = self.viewport.width / 2
@@ -72,7 +77,7 @@ class GameLayer(cocos.layer.base_layers.Layer):
   HEIGHT = 200
   def __init__(self):
     super(GameLayer, self).__init__()
-    self.size = (MainScene.WIDTH / 2, GameLayer.HEIGHT)
+    self.size = (GameScene.WIDTH / 2, GameLayer.HEIGHT)
     self.hero = Hero()
     self.add(self.hero)
 
@@ -83,63 +88,50 @@ class GameLayer(cocos.layer.base_layers.Layer):
       self.hero.hero_action(Hero.SLIDING)
 
 class Hero(cocos.cocosnode.CocosNode):
-  IMAGE_RUN1 = "images/katipunero.png"
-  IMAGE_RUN2 = "images/katipunero_run.png"
+  IMAGE_RUN = "images/Skater.png"
   SLIDE_NAME = "images/katipunero_slide.png"
   JUMP_NAME = "images/katipunero_jump.png"
   JUMPING = "Jumping"
   SLIDING = "Sliding"
   X = 100
-  Y = 100
-  RUNNING_CHANGE = .25
-  ACTION_DURATION = 0.5
+  Y = 250
+  RUNNING_CHANGE = 0.4
+  ACTION_DURATION = 0.4
 
   def __init__(self):
     super(Hero, self).__init__()
-    self.hero_running_1 = Sprite(Hero.IMAGE_RUN1)
-    self.hero_running_2 = Sprite(Hero.IMAGE_RUN2)
+    self.hero_running = Sprite(Hero.IMAGE_RUN)
     self.hero_slide = Sprite(Hero.SLIDE_NAME)
     self.hero_jump = Sprite(Hero.JUMP_NAME)
 
     self.add(self.hero_slide)
-    self.add(self.hero_running_1)
-    self.add(self.hero_running_2)
+    self.add(self.hero_running)
     self.add(self.hero_jump)
 
-    self.hero_running_2.visible = False
     self.hero_slide.visible = False
     self.hero_jump.visible = False
-    self.sliding = False
-    self.jumping = False
+    self.acting = False
     self.position = (Hero.X, Hero.Y)
 
-    self.schedule_interval(self.animate_running, Hero.RUNNING_CHANGE)
-
   def hero_action(self, action_type):
-    if not self.jumping and not self.sliding:
-      self.hero_running_1.visible = False
-      self.hero_running_2.visible = False
+    if not self.acting:
+      self.hero_running.visible = False
 
-      delay = Delay(0.5)
+      delay = Delay(Hero.ACTION_DURATION)
 
       hide_and_show = Lerp("visible", False, True, Hero.ACTION_DURATION)
       show_and_hide = Lerp("visible", True, False, Hero.ACTION_DURATION)
 
+      self.acting = True
       if action_type == Hero.JUMPING:
-        self.jumping = True
-        jump = Jump(x=0, y=Hero.Y, duration=Hero.ACTION_DURATION)
+        jump_height = Hero.Y + 100
+        jump = Jump(x=0, y=jump_height, duration=Hero.ACTION_DURATION)
         self.do(jump)
-        state_change = Lerp("jumping", self.jumping, not self.jumping, Hero.ACTION_DURATION)
         self.hero_jump.do(show_and_hide)
       elif action_type == Hero.SLIDING:
-        self.sliding = True
-        state_change = Lerp("sliding", self.sliding, not self.sliding, Hero.ACTION_DURATION)
         self.hero_slide.do(show_and_hide)
 
+      state_change = Lerp("acting", True, False, Hero.ACTION_DURATION)
       self.do(delay + state_change)
-      self.hero_running_1.do(delay + hide_and_show)
+      self.hero_running.do(delay + hide_and_show)
 
-  def animate_running(self, *args, **kwargs):
-    if not self.sliding and not self.jumping:
-      self.hero_running_1.visible = not self.hero_running_1.visible
-      self.hero_running_2.visible = not self.hero_running_2.visible
