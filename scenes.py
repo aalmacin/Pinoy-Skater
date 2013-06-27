@@ -78,6 +78,10 @@ class GameAction(Layer):
     elif key == keyboard_key.S:
       self.main_char.sit()
 
+  def on_key_release(self, key, modifiers):
+    if key == keyboard_key.S:
+      self.main_char.back_to_normal()
+
 class Skater(CocosNode):
   IMG_FILENAME = "images/Skater.png"
   JUMP_FILENAME = "images/SkaterJump.png"
@@ -114,8 +118,10 @@ class Skater(CocosNode):
 
   def sit(self):
     if not self.performing:
-      self.skater_main.do(Jump(x=0, y=100, duration=0.5))
-      self.do(Lerp("performing", True, False, 0.5))
+      self.skater_main.do(Hide())
+      self.skater_sit.do(Show())
 
-      self.skater_main.do(Hide() + Delay(0.5) + Show())
-      self.skater_sit.do(Show() + Delay(0.5) + Hide())
+  def back_to_normal(self):
+    if not self.performing:
+      self.skater_main.do(Show())
+      self.skater_sit.do(Hide())
