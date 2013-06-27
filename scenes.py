@@ -1,9 +1,11 @@
 import cocos
 from cocos.actions.interval_actions import *
+from cocos.actions.instant_actions import *
 from cocos.sprite import *
 from cocos.cocosnode import CocosNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
+from pyglet.window import key as keyboard_key
 
 class GameScene(Scene):
   WIDTH = 1200
@@ -62,6 +64,7 @@ class MovingBackground(Layer):
 
 
 class GameAction(Layer):
+  is_event_handler = True
   def __init__(self):
     super(GameAction, self).__init__()
 
@@ -69,15 +72,50 @@ class GameAction(Layer):
 
     self.add(self.main_char)
 
+  def on_key_press(self, key, modifiers):
+    if key == keyboard_key.W:
+      self.main_char.jump()
+    elif key == keyboard_key.S:
+      self.main_char.slide()
+
 class Skater(CocosNode):
   IMG_FILENAME = "images/Skater.png"
+  JUMP_FILENAME = "images/katipunero_jump.png"
+  SLIDE_FILENAME = "images/katipunero_slide.png"
   X = 100
   Y = 250
   def __init__(self):
     super(Skater, self).__init__()
 
     self.skater_main = Sprite(Skater.IMG_FILENAME)
+    self.skater_jump = Sprite(Skater.JUMP_FILENAME)
+    self.skater_slide = Sprite(Skater.SLIDE_FILENAME)
+
+    self.skater_jump.visible = False
+    self.skater_slide.visible = False
 
     self.add(self.skater_main)
-    self.skater_main.position = (Skater.X, Skater.Y)
+    self.add(self.skater_jump)
+    self.add(self.skater_slide)
 
+    self.skater_main.position = (Skater.X, Skater.Y)
+    self.skater_jump.position = (Skater.X, Skater.Y)
+    self.skater_slide.position = (Skater.X, Skater.Y)
+
+    self.performing = False
+
+  def jump(self):
+    if not self.performing:
+      self.do(Jump(x=0, y=100, duration=0.5))
+      self.do(Lerp("performing", True, False, 0.5))
+
+      self.skater_main.do(Hide() + Delay(0.5) + Show())
+      self.skater_jump.do(Show() + Delay(0.5) + Hide())
+
+  def slide(self):
+    if not self.performing:
+      self.skater_main.do(Jump(x=0, y=100, duration=0.5))
+      self.do(Lerp("performing", True, False, 0.5))
+
+      self.skater_main.do(Hide() + Delay(0.5) + Show())
+      self.skater_slide.do(Show() + Delay(0.5) + Hide())
