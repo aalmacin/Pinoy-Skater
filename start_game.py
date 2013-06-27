@@ -7,7 +7,7 @@ def main():
   cocos.director.director.init(width=1200, height=700)
 
   # Create the main Scene
-  main_scene = GameScene(cocos.director.director.window)
+  main_scene = GameScene()
 
   # Run the scene
   cocos.director.director.run(main_scene)
