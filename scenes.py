@@ -76,12 +76,12 @@ class GameAction(Layer):
     if key == keyboard_key.W:
       self.main_char.jump()
     elif key == keyboard_key.S:
-      self.main_char.slide()
+      self.main_char.sit()
 
 class Skater(CocosNode):
   IMG_FILENAME = "images/Skater.png"
-  JUMP_FILENAME = "images/katipunero_jump.png"
-  SLIDE_FILENAME = "images/katipunero_slide.png"
+  JUMP_FILENAME = "images/SkaterJump.png"
+  SLIDE_FILENAME = "images/SkaterSitting.png"
   X = 100
   Y = 250
   def __init__(self):
@@ -89,33 +89,33 @@ class Skater(CocosNode):
 
     self.skater_main = Sprite(Skater.IMG_FILENAME)
     self.skater_jump = Sprite(Skater.JUMP_FILENAME)
-    self.skater_slide = Sprite(Skater.SLIDE_FILENAME)
+    self.skater_sit = Sprite(Skater.SLIDE_FILENAME)
 
     self.skater_jump.visible = False
-    self.skater_slide.visible = False
+    self.skater_sit.visible = False
 
     self.add(self.skater_main)
     self.add(self.skater_jump)
-    self.add(self.skater_slide)
+    self.add(self.skater_sit)
 
     self.skater_main.position = (Skater.X, Skater.Y)
     self.skater_jump.position = (Skater.X, Skater.Y)
-    self.skater_slide.position = (Skater.X, Skater.Y)
+    self.skater_sit.position = (Skater.X, Skater.Y)
 
     self.performing = False
 
   def jump(self):
     if not self.performing:
-      self.do(Jump(x=0, y=100, duration=0.5))
+      self.do(Jump(x=0, y=200, duration=0.5))
       self.do(Lerp("performing", True, False, 0.5))
 
       self.skater_main.do(Hide() + Delay(0.5) + Show())
       self.skater_jump.do(Show() + Delay(0.5) + Hide())
 
-  def slide(self):
+  def sit(self):
     if not self.performing:
       self.skater_main.do(Jump(x=0, y=100, duration=0.5))
       self.do(Lerp("performing", True, False, 0.5))
 
       self.skater_main.do(Hide() + Delay(0.5) + Show())
-      self.skater_slide.do(Show() + Delay(0.5) + Hide())
+      self.skater_sit.do(Show() + Delay(0.5) + Hide())
