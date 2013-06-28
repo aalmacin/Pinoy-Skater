@@ -68,9 +68,26 @@ class GameAction(Layer):
   def __init__(self):
     super(GameAction, self).__init__()
 
+    rock_count = 3
+    bird_count = 3
+
     self.main_char = Skater()
 
+    self.score = 0
+    self.life = 3
+
     self.add(self.main_char)
+
+    obstacles = []
+
+    for i in range(0, rock_count):
+      obstacles.append(Obstacle("images/Stone.png", HittableObj.BOTTOM))
+
+    for i in range(0, bird_count):
+      obstacles.append(Obstacle("images/Bird.png", HittableObj.TOP))
+
+    for obs in obstacles:
+      self.add(obs)
 
   def on_key_press(self, key, modifiers):
     if key == keyboard_key.W:
@@ -127,10 +144,13 @@ class Skater(CocosNode):
       self.skater_sit.do(Hide())
 
 class HittableObj(CocosNode):
+  BOTTOM = (1200, 100)
+  TOP = (1200, 300)
   def __init__(self, image_name, pos):
     super(HittableObj, self).__init__()
     self.sprite = Sprite(image_name, anchor=(0,0))
     self.sprite.position = pos
+    self.add(self.sprite)
 
 class Obstacle(HittableObj):
   def __init__(self, image_name, pos):
