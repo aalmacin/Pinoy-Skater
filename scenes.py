@@ -4,7 +4,7 @@ from cocos.actions.instant_actions import *
 from cocos.sprite import *
 from cocos.cocosnode import CocosNode
 from cocos.scene import Scene
-from cocos.layer.base_layers import Layer
+from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
 
 class GameScene(Scene):
@@ -97,51 +97,50 @@ class GameAction(Layer):
 
   def on_key_release(self, key, modifiers):
     if key == keyboard_key.S:
-      self.main_char.back_to_normal()
+      self.main_char.performing = False
 
-class Skater(CocosNode):
-  IMG_FILENAME = "images/Skater.png"
-  JUMP_FILENAME = "images/SkaterJump.png"
-  SLIDE_FILENAME = "images/SkaterSitting.png"
+class Skater(MultiplexLayer):
+  IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
   X = 100
-  Y = 250
+  Y = 130
+  MAIN = 0
+  JUMP = 1
+  SIT = 2
+
   def __init__(self):
-    super(Skater, self).__init__()
+    layers = []
+    for file_name in Skater.IMG_FILENAMES:
+      self.temp_layer = Layer()
+      self.temp_layer.add(Sprite(file_name, anchor=(0,0)))
+      layers.append(self.temp_layer)
 
-    self.skater_main = Sprite(Skater.IMG_FILENAME)
-    self.skater_jump = Sprite(Skater.JUMP_FILENAME)
-    self.skater_sit = Sprite(Skater.SLIDE_FILENAME)
+    super(Skater, self).__init__(*layers)
 
-    self.skater_jump.visible = False
-    self.skater_sit.visible = False
-
-    self.add(self.skater_main)
-    self.add(self.skater_jump)
-    self.add(self.skater_sit)
-
-    self.skater_main.position = (Skater.X, Skater.Y)
-    self.skater_jump.position = (Skater.X, Skater.Y)
-    self.skater_sit.position = (Skater.X, Skater.Y)
-
+    self.y = Skater.Y
     self.performing = False
 
-  def jump(self):
-    if not self.performing:
-      self.do(Jump(x=0, y=200, duration=0.5))
-      self.do(Lerp("performing", True, False, 0.5))
+    self.schedule(self.show_correct_img)
 
-      self.skater_main.do(Hide() + Delay(0.5) + Show())
-      self.skater_jump.do(Show() + Delay(0.5) + Hide())
+  def jump(self):
+    if not self.performing and self.y == Skater.Y:
+      self.switch_to(Skater.JUMP)
+      self.performing = True
+      jump_height = Skater.Y + 200
+      jump_action = Jump(x=0, y=jump_height, duration=1)
+      jump_protection = Lerp("performing", True, False, 1)
+      self.do(jump_action | jump_protection)
 
   def sit(self):
-    if not self.performing:
-      self.skater_main.do(Hide())
-      self.skater_sit.do(Show())
+    if not self.performing and self.y == Skater.Y:
+      self.performing = True
+      self.switch_to(Skater.SIT)
 
-  def back_to_normal(self):
-    if not self.performing:
-      self.skater_main.do(Show())
-      self.skater_sit.do(Hide())
+  def to_normal(self):
+    self.switch_to(Skater.MAIN)
+
+  def show_correct_img(self, *args, **kwargs):
+    if not self.performing and self.y == Skater.Y:
+      self.to_normal()
 
 class HittableObj(CocosNode):
   BOTTOM = (1200, 100)
