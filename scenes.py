@@ -6,6 +6,7 @@ from cocos.cocosnode import CocosNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
+from random import choice
 
 class GameScene(Scene):
   WIDTH = 1200
@@ -68,8 +69,11 @@ class GameAction(Layer):
   def __init__(self):
     super(GameAction, self).__init__()
 
-    rock_count = 3
-    bird_count = 3
+    self.objects_speed = 10
+    self.obstacles_interval = 3
+    self.items_interval = 1
+    self.half_minute_count = 1
+    self.seconds_played = 1
 
     self.main_char = Skater()
 
@@ -77,16 +81,38 @@ class GameAction(Layer):
     self.life = 3
 
     self.add(self.main_char)
+    self.obstacles = []
+    self.setup_obstacles()
 
-    obstacles = []
+    self.schedule_interval(self.count_time_played, 1)
+    self.schedule_interval(self.throw_objects, 1)
+
+  def throw_objects(self, *args, **kwargs):
+    if self.seconds_played % self.obstacles_interval == 0:
+      obj_selected = False
+      while not obj_selected:
+        obj = choice(self.obstacles)
+        if obj.performing == False:
+          obj_selected = True
+          obj.performing = True
+          obj.speed = self.objects_speed
+
+  def count_time_played(self, *args, **kwargs):
+    self.seconds_played += 1
+    if self.seconds_played % 30 == 0:
+      self.half_minute_count += 1
+
+  def setup_obstacles(self):
+    rock_count = 3
+    bird_count = 3
 
     for i in range(0, rock_count):
-      obstacles.append(Obstacle("images/Stone.png", HittableObj.BOTTOM))
+      self.obstacles.append(Obstacle("images/Stone.png", HittableObj.BOTTOM))
 
     for i in range(0, bird_count):
-      obstacles.append(Obstacle("images/Bird.png", HittableObj.TOP))
+      self.obstacles.append(Obstacle("images/Bird.png", HittableObj.TOP))
 
-    for obs in obstacles:
+    for obs in self.obstacles:
       self.add(obs)
 
   def on_key_press(self, key, modifiers):
@@ -150,11 +176,20 @@ class HittableObj(CocosNode):
     self.sprite = Sprite(image_name, anchor=(0,0))
     self.sprite.position = pos
     self.add(self.sprite)
+    self.performing = False
+    self.speed = 0
+    self.schedule(self.move)
+
+  def move(self, *args, **kwargs):
+    if self.performing:
+      self.x -= self.speed
+    if self.x == 0:
+      self.sprite.x = 1200
+      self.performing = False
 
 class Obstacle(HittableObj):
   def __init__(self, image_name, pos):
     super(Obstacle, self).__init__(image_name, pos)
-
 
 class Item(HittableObj):
   def __init__(self, image_name):
