@@ -9,9 +9,22 @@ from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
 from random import choice
 
+class AllScenes():
+  def __init__(self):
+    # Initialize the director
+    cocos.director.director.init(width=1200, height=700)
+
+    # Create the main Scene
+    self.start_scene = StartScene(self)
+    self.game_scene = GameScene(self)
+    self.game_over_scene = GameOverScene(self)
+
+    # Run the scene
+    cocos.director.director.run(self.start_scene)
+
 class GameScene(Scene):
   WIDTH = 1200
-  def __init__(self):
+  def __init__(self, controller):
     super(GameScene, self).__init__()
 
     self.moving_bg = MovingBackground()
@@ -21,10 +34,13 @@ class GameScene(Scene):
     self.add(self.game_action_layer, z=1)
 
     self.schedule(self.check_if_game_over)
+    self.controller = controller
 
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
-      cocos.director.director.replace(GameOverScene())
+      cocos.director.director.replace(self.controller.game_over_scene)
+      #TODO RESET
+      self.game_action_layer.game_over = False
 
 class MovingBackground(Layer):
   def __init__(self):
@@ -238,7 +254,7 @@ class LifeHolder(Layer):
       self.remove(self.get(str(self.lives)))
 
 class StartScene(Scene):
-  def __init__(self):
+  def __init__(self, controller):
     super(StartScene, self).__init__()
 
     self.menu = Menu()
@@ -246,12 +262,13 @@ class StartScene(Scene):
     self.menu.create_menu(menu_items)
     self.add(Sprite("images/StartScreenImage.png", anchor=(0,0)), z=0)
     self.add(self.menu, z=1)
+    self.controller = controller
 
   def switch_to_game_screen(self):
-    cocos.director.director.replace(GameScene())
+    cocos.director.director.replace(self.controller.game_scene)
 
 class GameOverScene(Scene):
-  def __init__(self):
+  def __init__(self, controller):
     super(GameOverScene, self).__init__()
 
     self.menu = Menu()
@@ -259,6 +276,7 @@ class GameOverScene(Scene):
     self.menu.create_menu(menu_items)
     self.add(Sprite("images/GameOverScreenImage.png", anchor=(0,0)), z=0)
     self.add(self.menu, z=1)
+    self.controller = controller
 
   def switch_to_game_screen(self):
-    cocos.director.director.replace(GameScene())
+    cocos.director.director.replace(self.controller.game_scene)
