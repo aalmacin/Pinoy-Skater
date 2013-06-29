@@ -26,7 +26,6 @@ class GameScene(Scene):
     if self.game_action_layer.game_over == True:
       cocos.director.director.replace(GameOverScene())
 
-
 class MovingBackground(Layer):
   def __init__(self):
     super(MovingBackground, self).__init__()
@@ -103,9 +102,9 @@ class GameAction(Layer):
       while not obj_selected:
         obj = choice(self.obstacles)
         if obj.performing == False:
-          obj_selected = True
           obj.performing = True
           obj.speed = self.objects_speed + (self.half_minute_count * 5)
+          obj_selected = True
 
   def count_time_played(self, *args, **kwargs):
     self.seconds_played += 1
@@ -114,8 +113,8 @@ class GameAction(Layer):
       self.half_minute_count += 1
 
   def setup_obstacles(self):
-    rock_count = 3
-    bird_count = 3
+    rock_count = 5
+    bird_count = 5
 
     for i in range(0, rock_count):
       self.obstacles.append(Obstacle("images/Rock.png", HittableObj.BOTTOM))
@@ -147,9 +146,6 @@ class GameAction(Layer):
         self.life_holder.update_image()
         if self.life_holder.lives == 0:
           self.game_over = True
-
-  def reset(self):
-    print "RESET"
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
@@ -209,7 +205,8 @@ class HittableObj(CocosNode):
   def move(self, *args, **kwargs):
     if self.performing:
       self.sprite.x -= self.speed
-    if self.sprite.x == -self.sprite.width:
+
+    if self.sprite.x <= -self.sprite.width:
       self.reset()
 
   def reset(self):
