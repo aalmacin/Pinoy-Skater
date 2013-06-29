@@ -127,11 +127,11 @@ class GameAction(Layer):
       self.main_char.performing = False
 
   def check_collisions(self, *args, **kwargs):
-    for x in self.main_char.get_children():
-      main_obj = x.get_children()[0]
-
     for obstacle in self.obstacles:
-      if obstacle.sprite.x in range(main_obj.x, main_obj.width - 50):
+      main_obj = self.main_char.get_children()[0].get_children()[0]
+      hit_x = obstacle.sprite.x in range(int(self.main_char.x), main_obj.width - 50)
+      hit_y = obstacle.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
+      if hit_x and hit_y:
         obstacle.reset()
         self.life -= 1
 
@@ -146,9 +146,9 @@ class Skater(MultiplexLayer):
   def __init__(self):
     layers = []
     for file_name in Skater.IMG_FILENAMES:
-      self.temp_layer = Layer()
-      self.temp_layer.add(Sprite(file_name, anchor=(0,0)))
-      layers.append(self.temp_layer)
+      temp_layer = Layer()
+      temp_layer.add(Sprite(file_name, anchor=(0,0)))
+      layers.append(temp_layer)
 
     super(Skater, self).__init__(*layers)
 
@@ -179,7 +179,7 @@ class Skater(MultiplexLayer):
       self.to_normal()
 
 class HittableObj(CocosNode):
-  BOTTOM = (1200, 100)
+  BOTTOM = (1200, 130)
   TOP = (1200, 300)
   def __init__(self, image_name, pos):
     super(HittableObj, self).__init__()
@@ -193,7 +193,7 @@ class HittableObj(CocosNode):
   def move(self, *args, **kwargs):
     if self.performing:
       self.sprite.x -= self.speed
-    if self.sprite.x == 0:
+    if self.sprite.x == -self.sprite.width:
       self.reset()
 
   def reset(self):
