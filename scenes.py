@@ -3,6 +3,7 @@ from cocos.actions.interval_actions import *
 from cocos.actions.instant_actions import *
 from cocos.sprite import *
 from cocos.cocosnode import CocosNode
+from cocos.menu import *
 from cocos.scene import Scene
 from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
@@ -23,10 +24,8 @@ class GameScene(Scene):
 
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
-      self.end()
+      cocos.director.director.replace(GameOverScene())
 
-  def on_exit(self):
-    cocos.director.director.replace(GameOverScene())
 
 class MovingBackground(Layer):
   def __init__(self):
@@ -245,6 +244,24 @@ class StartScene(Scene):
   def __init__(self):
     super(StartScene, self).__init__()
 
+    self.menu = Menu()
+    menu_items = [MenuItem("Start", self.switch_to_game_screen)]
+    self.menu.create_menu(menu_items)
+    self.add(Sprite("images/StartScreenImage.png", anchor=(0,0)), z=0)
+    self.add(self.menu, z=1)
+
+  def switch_to_game_screen(self):
+    cocos.director.director.replace(GameScene())
+
 class GameOverScene(Scene):
   def __init__(self):
     super(GameOverScene, self).__init__()
+
+    self.menu = Menu()
+    menu_items = [MenuItem("Play Again", self.switch_to_game_screen)]
+    self.menu.create_menu(menu_items)
+    self.add(Sprite("images/GameOverScreenImage.png", anchor=(0,0)), z=0)
+    self.add(self.menu, z=1)
+
+  def switch_to_game_screen(self):
+    cocos.director.director.replace(GameScene())
