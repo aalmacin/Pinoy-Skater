@@ -1,5 +1,5 @@
 import cocos
-from scenes import GameScene
+from scenes import *
 
 # Start the game
 def main():

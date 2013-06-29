@@ -13,11 +13,20 @@ class GameScene(Scene):
   def __init__(self):
     super(GameScene, self).__init__()
 
-    moving_bg = MovingBackground()
-    game_action_layer = GameAction()
+    self.moving_bg = MovingBackground()
+    self.game_action_layer = GameAction()
 
-    self.add(moving_bg, z=0)
-    self.add(game_action_layer, z=1)
+    self.add(self.moving_bg, z=0)
+    self.add(self.game_action_layer, z=1)
+
+    self.schedule(self.check_if_game_over)
+
+  def check_if_game_over(self, *args, **kwargs):
+    if self.game_action_layer.game_over == True:
+      self.end()
+
+  def on_exit(self):
+    cocos.director.director.replace(GameOverScene())
 
 class MovingBackground(Layer):
   def __init__(self):
@@ -75,6 +84,7 @@ class GameAction(Layer):
     self.seconds_played = 1
 
     self.main_char = Skater()
+    self.game_over = False
 
     self.score = 0
     self.life_holder = LifeHolder()
@@ -96,10 +106,11 @@ class GameAction(Layer):
         if obj.performing == False:
           obj_selected = True
           obj.performing = True
-          obj.speed = self.objects_speed
+          obj.speed = self.objects_speed + (self.half_minute_count * 5)
 
   def count_time_played(self, *args, **kwargs):
     self.seconds_played += 1
+    # Increase speed every 30 seconds
     if self.seconds_played % 30 == 0:
       self.half_minute_count += 1
 
@@ -135,6 +146,11 @@ class GameAction(Layer):
         obstacle.reset()
         self.life_holder.lives -= 1
         self.life_holder.update_image()
+        if self.life_holder.lives == 0:
+          self.game_over = True
+
+  def reset(self):
+    print "RESET"
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
@@ -225,3 +241,10 @@ class LifeHolder(Layer):
     if self.lives < 3:
       self.remove(self.get(str(self.lives)))
 
+class StartScene(Scene):
+  def __init__(self):
+    super(StartScene, self).__init__()
+
+class GameOverScene(Scene):
+  def __init__(self):
+    super(GameOverScene, self).__init__()
