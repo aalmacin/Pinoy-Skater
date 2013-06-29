@@ -348,13 +348,24 @@ class StartScene(Scene):
 class GameOverScene(Scene):
   def __init__(self, controller):
     super(GameOverScene, self).__init__()
+    self.text_pos = (cocos.director.director.window.width/2,cocos.director.director.window.height/2)
 
     self.menu = Menu()
-    menu_items = [MenuItem("Play Again", self.switch_to_game_screen)]
+    restart_button = ImageMenuItem("images/RestartButton.png", self.switch_to_game_screen)
+    menu_items = [restart_button]
+    restart_button.scale = 2
+    restart_button.y = -200
+
     self.menu.create_menu(menu_items)
     self.add(Sprite("images/GameOverScreenImage.png", anchor=(0,0)), z=0)
     self.add(self.menu, z=1)
     self.controller = controller
+
+    self.score_layer = Layer()
+    self.final_score = 0
+    self.final_score_label = Label(text="Final Score: 0", font_size=32, position=self.text_pos, anchor_x="center", anchor_y="center", color=(255, 30, 30, 200))
+    self.score_layer.add(self.final_score_label)
+    self.add(self.score_layer, z=2)
 
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
