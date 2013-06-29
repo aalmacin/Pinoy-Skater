@@ -14,6 +14,7 @@ class AllScenes():
   def __init__(self):
     # Initialize the director
     cocos.director.director.init(width=1200, height=700)
+    cocos.director.director.window.set_caption("Pinoy Skater")
 
     # Create the main Scene
     self.start_scene = StartScene(self)
