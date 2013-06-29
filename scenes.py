@@ -151,6 +151,16 @@ class GameAction(Layer):
     for obs in self.obstacles:
       self.add(obs)
 
+  # Mouse or keyboard for controls
+  def on_mouse_motion(self, x, y, dx, dy):
+    print x, y, dx, dy
+    if y > 400:
+      self.main_char.jump()
+    elif y > 120 and y <= 300:
+      self.main_char.performing = False
+    elif y <= 120:
+      self.main_char.sit()
+
   def on_key_press(self, key, modifiers):
     if key == keyboard_key.W:
       self.main_char.jump()
