@@ -8,6 +8,7 @@ from cocos.scene import Scene
 from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
 from random import choice
+from cocos.text import *
 
 class AllScenes():
   def __init__(self):
@@ -110,7 +111,6 @@ class GameAction(Layer):
     self.main_char = Skater()
     self.game_over = False
 
-    self.score = 0
     self.score_given = 100
     self.life_holder = LifeHolder()
     self.add(self.life_holder)
@@ -125,6 +125,9 @@ class GameAction(Layer):
     self.schedule_interval(self.count_time_played, 1)
     self.schedule_interval(self.throw_objects, 1)
     self.schedule(self.check_collisions)
+
+    self.scorer = Scorer()
+    self.add(self.scorer)
 
   def throw_objects(self, *args, **kwargs):
     if self.seconds_played % self.obstacles_interval == 0:
@@ -213,8 +216,8 @@ class GameAction(Layer):
       hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         item.reset()
-        self.score += self.score_given
-        print self.score
+        self.scorer.score += self.score_given
+        self.scorer.update_text()
 
   def reset(self):
     self.life_holder.reset()
@@ -351,3 +354,14 @@ class GameOverScene(Scene):
 
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
+
+class Scorer(CocosNode):
+  TEXT_POS = (10, 650)
+  def __init__(self):
+    super(Scorer, self).__init__()
+    self.score = 0
+    self.scorer = Label(text="Score: 0", font_size=32, position=Scorer.TEXT_POS)
+    self.add(self.scorer)
+
+  def update_text(self):
+    self.scorer.element.text = "Score: " + str(self.score)
