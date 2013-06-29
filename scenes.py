@@ -63,7 +63,6 @@ class MovingBackground(Layer):
         if obj.x == -GameScene.WIDTH:
           obj.x = GameScene.WIDTH
 
-
 class GameAction(Layer):
   is_event_handler = True
   def __init__(self):
@@ -78,7 +77,8 @@ class GameAction(Layer):
     self.main_char = Skater()
 
     self.score = 0
-    self.life = 3
+    self.life_holder = LifeHolder()
+    self.add(self.life_holder)
 
     self.add(self.main_char)
     self.obstacles = []
@@ -133,7 +133,8 @@ class GameAction(Layer):
       hit_y = obstacle.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         obstacle.reset()
-        self.life -= 1
+        self.life_holder.lives -= 1
+        self.life_holder.update_image()
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
@@ -200,7 +201,6 @@ class HittableObj(CocosNode):
     self.sprite.x = 1200
     self.performing = False
 
-
 class Obstacle(HittableObj):
   def __init__(self, image_name, pos):
     super(Obstacle, self).__init__(image_name, pos)
@@ -208,3 +208,20 @@ class Obstacle(HittableObj):
 class Item(HittableObj):
   def __init__(self, image_name):
     super(Item, self).__init__(image_name, pos)
+
+class LifeHolder(Layer):
+  IMAGE_NAME = "images/Heart.png"
+  def __init__(self):
+    super(Layer, self).__init__()
+    self.lives = 3
+    self.x_pos = [10, 65, 120]
+    for i in range(0, self.lives):
+      temp_sprite = Sprite(LifeHolder.IMAGE_NAME, anchor=(0,0))
+      temp_sprite.x = self.x_pos[i]
+      temp_sprite.y = 20
+      self.add(temp_sprite, name=str(i))
+
+  def update_image(self):
+    if self.lives < 3:
+      self.remove(self.get(str(self.lives)))
+
