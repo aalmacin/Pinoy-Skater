@@ -39,8 +39,12 @@ class GameScene(Scene):
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
       cocos.director.director.replace(self.controller.game_over_scene)
-      #TODO RESET
+      self.reset()
       self.game_action_layer.game_over = False
+
+  def reset(self):
+    self.moving_bg.reset()
+    self.game_action_layer.reset()
 
 class MovingBackground(Layer):
   def __init__(self):
@@ -85,6 +89,12 @@ class MovingBackground(Layer):
         obj.x -= self.parallax_speed[i]
         if obj.x == -GameScene.WIDTH:
           obj.x = GameScene.WIDTH
+
+  def reset(self):
+    for bg in self.parallax_bgs:
+      for i in range(0, len(bg)):
+        bg_img = bg[i]
+        bg_img.x = self.positions[i]
 
 class GameAction(Layer):
   is_event_handler = True
@@ -162,6 +172,18 @@ class GameAction(Layer):
         self.life_holder.update_image()
         if self.life_holder.lives == 0:
           self.game_over = True
+
+  def reset(self):
+    self.life_holder.reset()
+    self.game_over = False
+    self.objects_speed = 10
+    self.obstacles_interval = 3
+    self.items_interval = 1
+    self.half_minute_count = 1
+    self.seconds_played = 1
+    self.score = 0
+    for obs in self.obstacles:
+      obs.reset()
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
@@ -251,7 +273,12 @@ class LifeHolder(Layer):
 
   def update_image(self):
     if self.lives < 3:
-      self.remove(self.get(str(self.lives)))
+      self.get(str(self.lives)).visible = False
+
+  def reset(self):
+    self.lives = 3
+    for i in range(0, 3):
+      self.get(str(i)).visible = True
 
 class StartScene(Scene):
   def __init__(self, controller):
