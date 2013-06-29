@@ -108,7 +108,7 @@ class GameAction(Layer):
     bird_count = 3
 
     for i in range(0, rock_count):
-      self.obstacles.append(Obstacle("images/Stone.png", HittableObj.BOTTOM))
+      self.obstacles.append(Obstacle("images/Rock.png", HittableObj.BOTTOM))
 
     for i in range(0, bird_count):
       self.obstacles.append(Obstacle("images/Bird.png", HittableObj.TOP))
@@ -133,6 +133,7 @@ class GameAction(Layer):
     for obstacle in self.obstacles:
       if obstacle.sprite.x in range(main_obj.x, main_obj.width - 50):
         obstacle.reset()
+        self.life -= 1
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
