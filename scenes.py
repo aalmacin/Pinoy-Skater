@@ -118,6 +118,9 @@ class GameAction(Layer):
     self.obstacles = []
     self.setup_obstacles()
 
+    self.items = []
+    self.setup_items()
+
     self.schedule_interval(self.count_time_played, 1)
     self.schedule_interval(self.throw_objects, 1)
     self.schedule(self.check_collisions)
@@ -131,6 +134,14 @@ class GameAction(Layer):
           obj.performing = True
           obj.speed = self.objects_speed + (self.half_minute_count * 5)
           obj_selected = True
+    elif self.seconds_played % self.items_interval == 0:
+      item_selected = False
+      while not item_selected:
+        item = choice(self.items)
+        if item.performing == False:
+          item.performing = True
+          item.speed = self.objects_speed + (self.half_minute_count * 5)
+          item_selected = True
 
   def count_time_played(self, *args, **kwargs):
     self.seconds_played += 1
@@ -151,9 +162,21 @@ class GameAction(Layer):
     for obs in self.obstacles:
       self.add(obs)
 
+  def setup_items(self):
+    coin_count_top = 10
+    coin_count_bottom = 10
+
+    for i in range(0, coin_count_top):
+      self.items.append(Item("images/Candy.png", HittableObj.TOP))
+
+    for i in range(0, coin_count_bottom):
+      self.items.append(Item("images/Candy.png", HittableObj.BOTTOM))
+
+    for item in self.items:
+      self.add(item)
+
   # Mouse or keyboard for controls
   def on_mouse_motion(self, x, y, dx, dy):
-    print x, y, dx, dy
     if y > 400:
       self.main_char.jump()
     elif y > 120 and y <= 300:
@@ -266,7 +289,7 @@ class Obstacle(HittableObj):
     super(Obstacle, self).__init__(image_name, pos)
 
 class Item(HittableObj):
-  def __init__(self, image_name):
+  def __init__(self, image_name, pos):
     super(Item, self).__init__(image_name, pos)
 
 class LifeHolder(Layer):
