@@ -86,6 +86,7 @@ class GameAction(Layer):
 
     self.schedule_interval(self.count_time_played, 1)
     self.schedule_interval(self.throw_objects, 1)
+    self.schedule(self.check_collisions)
 
   def throw_objects(self, *args, **kwargs):
     if self.seconds_played % self.obstacles_interval == 0:
@@ -124,6 +125,14 @@ class GameAction(Layer):
   def on_key_release(self, key, modifiers):
     if key == keyboard_key.S:
       self.main_char.performing = False
+
+  def check_collisions(self, *args, **kwargs):
+    for x in self.main_char.get_children():
+      main_obj = x.get_children()[0]
+
+    for obstacle in self.obstacles:
+      if obstacle.sprite.x in range(main_obj.x, main_obj.width - 50):
+        obstacle.reset()
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
@@ -182,10 +191,14 @@ class HittableObj(CocosNode):
 
   def move(self, *args, **kwargs):
     if self.performing:
-      self.x -= self.speed
-    if self.x == 0:
-      self.sprite.x = 1200
-      self.performing = False
+      self.sprite.x -= self.speed
+    if self.sprite.x == 0:
+      self.reset()
+
+  def reset(self):
+    self.sprite.x = 1200
+    self.performing = False
+
 
 class Obstacle(HittableObj):
   def __init__(self, image_name, pos):
