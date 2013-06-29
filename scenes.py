@@ -40,6 +40,8 @@ class GameScene(Scene):
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
       cocos.director.director.replace(self.controller.game_over_scene)
+      self.controller.game_over_scene.final_score = self.game_action_layer.scorer.score
+      self.controller.game_over_scene.update_text()
       self.reset()
       self.game_action_layer.game_over = False
 
@@ -228,6 +230,8 @@ class GameAction(Layer):
     self.half_minute_count = 1
     self.seconds_played = 1
     self.score = 0
+    self.scorer.score = 0
+    self.scorer.update_text()
     for obs in self.obstacles:
       obs.reset()
 
@@ -369,6 +373,9 @@ class GameOverScene(Scene):
 
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
+
+  def update_text(self):
+    self.final_score_label.element.text = "Final Score: " + str(self.final_score)
 
 class Scorer(CocosNode):
   TEXT_POS = (10, 650)
