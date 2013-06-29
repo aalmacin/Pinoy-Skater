@@ -168,7 +168,7 @@ class GameAction(Layer):
     coin_count_bottom = 10
 
     for i in range(0, coin_count_top):
-      self.items.append(Item("images/Candy.png", HittableObj.TOP))
+      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP))
 
     for i in range(0, coin_count_bottom):
       self.items.append(Item("images/Candy.png", HittableObj.BOTTOM))
@@ -254,7 +254,7 @@ class Skater(MultiplexLayer):
     if not self.performing and self.y == Skater.Y:
       self.switch_to(Skater.JUMP)
       self.performing = True
-      jump_height = Skater.Y + 200
+      jump_height = Skater.Y + 60
       jump_action = Jump(x=0, y=jump_height, duration=1)
       jump_protection = Lerp("performing", True, False, 1)
       self.do(jump_action | jump_protection)
@@ -274,6 +274,7 @@ class Skater(MultiplexLayer):
 class HittableObj(CocosNode):
   BOTTOM = (1200, 130)
   TOP = (1200, 300)
+  CANDY_TOP = (1200, 400)
   def __init__(self, image_name, pos):
     super(HittableObj, self).__init__()
     self.sprite = Sprite(image_name, anchor=(0,0))
