@@ -111,6 +111,7 @@ class GameAction(Layer):
     self.game_over = False
 
     self.score = 0
+    self.score_given = 100
     self.life_holder = LifeHolder()
     self.add(self.life_holder)
 
@@ -205,6 +206,15 @@ class GameAction(Layer):
         self.life_holder.update_image()
         if self.life_holder.lives == 0:
           self.game_over = True
+
+    for item in self.items:
+      main_obj = self.main_char.get_children()[0].get_children()[0]
+      hit_x = item.sprite.x in range(int(self.main_char.x), main_obj.width - 50)
+      hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
+      if hit_x and hit_y:
+        item.reset()
+        self.score += self.score_given
+        print self.score
 
   def reset(self):
     self.life_holder.reset()
