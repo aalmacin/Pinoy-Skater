@@ -332,7 +332,11 @@ class StartScene(Scene):
     super(StartScene, self).__init__()
 
     self.menu = Menu()
-    menu_items = [MenuItem("Start", self.switch_to_game_screen)]
+    start_button = ImageMenuItem("images/StartButton.png", self.switch_to_game_screen)
+    start_button.scale = 2
+    start_button.y = -200
+    menu_items = [start_button]
+
     self.menu.create_menu(menu_items)
     self.add(Sprite("images/StartScreenImage.png", anchor=(0,0)), z=0)
     self.add(self.menu, z=1)
