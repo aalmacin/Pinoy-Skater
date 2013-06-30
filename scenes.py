@@ -133,6 +133,10 @@ class GameAction(Layer):
     self.scorer = Scorer()
     self.add(self.scorer)
 
+    self.hit_graphic = Sprite("images/Hit.png", anchor=(0,0))
+    self.add(self.hit_graphic, z=10)
+    self.hit_graphic.visible = False
+
   def throw_objects(self, *args, **kwargs):
     if self.seconds_played % self.obstacles_interval == 0:
       obj_selected = False
@@ -208,6 +212,8 @@ class GameAction(Layer):
       hit_x = obstacle.sprite.x in range(int(self.main_char.x), int(self.main_char.x) + main_obj.width - 50)
       hit_y = obstacle.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
+        self.hit_graphic.position = (self.main_char.x + obstacle.sprite.width, obstacle.sprite.y)
+        self.hit_graphic.do(Lerp("visible", True, False, 0.5))
         obstacle.reset()
         self.life_holder.lives -= 1
         self.life_holder.update_image()
@@ -234,6 +240,7 @@ class GameAction(Layer):
     self.score = 0
     self.scorer.score = 0
     self.scorer.update_text()
+    self.hit_graphic.visible = False
     for obs in self.obstacles:
       obs.reset()
 
