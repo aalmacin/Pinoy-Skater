@@ -112,6 +112,7 @@ class GameAction(Layer):
     self.seconds_played = 1
 
     self.main_char = Skater()
+    self.main_char.x = 100
     self.game_over = False
 
     self.score_given = 100
@@ -204,7 +205,7 @@ class GameAction(Layer):
   def check_collisions(self, *args, **kwargs):
     for obstacle in self.obstacles:
       main_obj = self.main_char.get_children()[0].get_children()[0]
-      hit_x = obstacle.sprite.x in range(int(self.main_char.x), main_obj.width - 50)
+      hit_x = obstacle.sprite.x in range(int(self.main_char.x), int(self.main_char.x) + main_obj.width - 50)
       hit_y = obstacle.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         obstacle.reset()
@@ -215,7 +216,7 @@ class GameAction(Layer):
 
     for item in self.items:
       main_obj = self.main_char.get_children()[0].get_children()[0]
-      hit_x = item.sprite.x in range(int(self.main_char.x), main_obj.width - 50)
+      hit_x = item.sprite.x in range(int(self.main_char.x), int(self.main_char.x) + main_obj.width - 50)
       hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         item.reset()
@@ -262,7 +263,7 @@ class Skater(MultiplexLayer):
     if not self.performing and self.y == Skater.Y:
       self.switch_to(Skater.JUMP)
       self.performing = True
-      jump_height = Skater.Y + 60
+      jump_height = Skater.Y + 30
       jump_action = Jump(x=0, y=jump_height, duration=1)
       jump_protection = Lerp("performing", True, False, 1)
       self.do(jump_action | jump_protection)
