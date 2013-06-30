@@ -170,14 +170,14 @@ class GameAction(Layer):
       self.add(obs)
 
   def setup_items(self):
-    coin_count_top = 10
+    coin_count_top = 5
     coin_count_bottom = 10
 
     for i in range(0, coin_count_top):
-      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP))
+      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200))
 
     for i in range(0, coin_count_bottom):
-      self.items.append(Item("images/Candy.png", HittableObj.BOTTOM))
+      self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100))
 
     for item in self.items:
       self.add(item)
@@ -219,7 +219,7 @@ class GameAction(Layer):
       hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         item.reset()
-        self.scorer.score += self.score_given
+        self.scorer.score += item.points
         self.scorer.update_text()
 
   def reset(self):
@@ -308,8 +308,9 @@ class Obstacle(HittableObj):
     super(Obstacle, self).__init__(image_name, pos)
 
 class Item(HittableObj):
-  def __init__(self, image_name, pos):
+  def __init__(self, image_name, pos, points):
     super(Item, self).__init__(image_name, pos)
+    self.points = points
 
 class LifeHolder(Layer):
   IMAGE_NAME = "images/Heart.png"
