@@ -376,10 +376,18 @@ class InstructionsScene(Scene):
 
     self.instructions_image_mask_top.y = 650
 
+    self.menu = Menu()
+    play_button = MenuItem("Play Game", self.switch_to_game_screen)
+    play_button.y = -300
+
+    menu_items = [play_button]
+    self.menu.create_menu(menu_items)
+
     self.add(self.instructions_image, z=0)
     self.add(self.instructions_content, z=1)
     self.add(self.instructions_image_mask_top, z=2)
     self.add(self.instructions_image_mask, z=3)
+    self.add(self.menu, z=4)
     self.controller = controller
 
   def switch_to_game_screen(self):
