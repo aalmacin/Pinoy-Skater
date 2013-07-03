@@ -18,6 +18,7 @@ class AllScenes():
 
     # Create the main Scene
     self.start_scene = StartScene(self)
+    self.instructions_scene = InstructionsScene(self)
     self.game_scene = GameScene(self)
     self.game_over_scene = GameOverScene(self)
 
@@ -346,7 +347,7 @@ class StartScene(Scene):
     super(StartScene, self).__init__()
 
     self.menu = Menu()
-    start_button = ImageMenuItem("images/StartButton.png", self.switch_to_game_screen)
+    start_button = ImageMenuItem("images/StartButton.png", self.switch_to_instructions_screen)
     start_button.scale = 2
     start_button.y = -200
     menu_items = [start_button]
@@ -356,8 +357,46 @@ class StartScene(Scene):
     self.add(self.menu, z=1)
     self.controller = controller
 
+  def switch_to_instructions_screen(self):
+    cocos.director.director.replace(self.controller.instructions_scene)
+
+
+class InstructionsScene(Scene):
+  def __init__(self, controller):
+    super(InstructionsScene, self).__init__()
+
+    self.instructions_image = Sprite("images/InstructionsImage.png", anchor=(0,0))
+    self.instructions_content_image = Sprite("images/Instructions.png", anchor=(0,1800))
+    self.instructions_image_mask_top = Sprite("images/InstructionsMaskTop.png", anchor=(0,0))
+    self.instructions_image_mask = Sprite("images/InstructionsMask.png", anchor=(0,0))
+    self.instructions_content = MoveByMouseLayer(self.instructions_content_image)
+
+    self.instructions_content.x = 73
+    self.instructions_content.y = 50
+
+    self.instructions_image_mask_top.y = 650
+
+    self.add(self.instructions_image, z=0)
+    self.add(self.instructions_content, z=1)
+    self.add(self.instructions_image_mask_top, z=2)
+    self.add(self.instructions_image_mask, z=3)
+    self.controller = controller
+
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
+
+class MoveByMouseLayer(Layer):
+  is_event_handler = True
+  def __init__(self, content_image):
+    super(MoveByMouseLayer, self).__init__()
+    self.content_image = content_image
+    self.add(self.content_image)
+
+  def on_mouse_motion(self, x, y, dx, dy):
+    if y >= cocos.director.director.window.height/2 and self.content_image.y >= 0:
+      self.content_image.y -= 10
+    elif y < cocos.director.director.window.height/2 and self.content_image.y < 1900:
+      self.content_image.y += 10
 
 class GameOverScene(Scene):
   def __init__(self, controller):
