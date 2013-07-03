@@ -9,6 +9,10 @@ from cocos.layer.base_layers import *
 from pyglet.window import key as keyboard_key
 from random import choice
 from cocos.text import *
+import cocos.audio.pygame.music as game_music
+import cocos.audio.pygame.mixer as game_mixer
+
+cocos.audio.pygame.mixer.init()
 
 class AllScenes():
   def __init__(self):
@@ -23,6 +27,8 @@ class AllScenes():
     self.game_over_scene = GameOverScene(self)
 
     # Run the scene
+    game_music.load("sounds/startscreen_snd.wav")
+    game_music.play(-1)
     cocos.director.director.run(self.start_scene)
 
 class GameScene(Scene):
@@ -167,10 +173,10 @@ class GameAction(Layer):
     bird_count = 5
 
     for i in range(0, rock_count):
-      self.obstacles.append(Obstacle("images/Rock.png", HittableObj.BOTTOM))
+      self.obstacles.append(HittableObj("images/Rock.png", HittableObj.BOTTOM, game_mixer.Sound("sounds/ouch.wav")))
 
     for i in range(0, bird_count):
-      self.obstacles.append(Obstacle("images/Bird.png", HittableObj.TOP))
+      self.obstacles.append(HittableObj("images/Bird.png", HittableObj.TOP, game_mixer.Sound("sounds/ouch.wav")))
 
     for obs in self.obstacles:
       self.add(obs)
@@ -180,10 +186,10 @@ class GameAction(Layer):
     coin_count_bottom = 10
 
     for i in range(0, coin_count_top):
-      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200))
+      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200, game_mixer.Sound("sounds/candy.wav")))
 
     for i in range(0, coin_count_bottom):
-      self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100))
+      self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100, game_mixer.Sound("sounds/coin_pickup.wav")))
 
     for item in self.items:
       self.add(item)
@@ -216,6 +222,7 @@ class GameAction(Layer):
         self.hit_graphic.position = (self.main_char.x + obstacle.sprite.width, obstacle.sprite.y)
         self.hit_graphic.do(Lerp("visible", True, False, 0.5))
         obstacle.reset()
+        obstacle.play_sound()
         self.life_holder.lives -= 1
         self.life_holder.update_image()
         if self.life_holder.lives == 0:
@@ -227,6 +234,7 @@ class GameAction(Layer):
       hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
       if hit_x and hit_y:
         item.reset()
+        item.play_sound()
         self.scorer.score += item.points
         self.scorer.update_text()
 
@@ -292,7 +300,7 @@ class HittableObj(CocosNode):
   BOTTOM = (1200, 130)
   TOP = (1200, 300)
   CANDY_TOP = (1200, 400)
-  def __init__(self, image_name, pos):
+  def __init__(self, image_name, pos, sound):
     super(HittableObj, self).__init__()
     self.sprite = Sprite(image_name, anchor=(0,0))
     self.sprite.position = pos
@@ -300,6 +308,7 @@ class HittableObj(CocosNode):
     self.performing = False
     self.speed = 0
     self.schedule(self.move)
+    self.sound = sound
 
   def move(self, *args, **kwargs):
     if self.performing:
@@ -312,13 +321,12 @@ class HittableObj(CocosNode):
     self.sprite.x = 1200
     self.performing = False
 
-class Obstacle(HittableObj):
-  def __init__(self, image_name, pos):
-    super(Obstacle, self).__init__(image_name, pos)
+  def play_sound(self):
+    self.sound.play()
 
 class Item(HittableObj):
-  def __init__(self, image_name, pos, points):
-    super(Item, self).__init__(image_name, pos)
+  def __init__(self, image_name, pos, points, sound):
+    super(Item, self).__init__(image_name, pos, sound)
     self.points = points
 
 class LifeHolder(Layer):
@@ -360,7 +368,6 @@ class StartScene(Scene):
   def switch_to_instructions_screen(self):
     cocos.director.director.replace(self.controller.instructions_scene)
 
-
 class InstructionsScene(Scene):
   def __init__(self, controller):
     super(InstructionsScene, self).__init__()
@@ -377,8 +384,9 @@ class InstructionsScene(Scene):
     self.instructions_image_mask_top.y = 650
 
     self.menu = Menu()
-    play_button = MenuItem("Play Game", self.switch_to_game_screen)
+    play_button = ImageMenuItem("images/InstructionsButton.png", self.switch_to_game_screen)
     play_button.y = -300
+    play_button.scale = 1.5
 
     menu_items = [play_button]
     self.menu.create_menu(menu_items)
