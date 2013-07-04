@@ -44,7 +44,7 @@ class GameScene(Scene):
 
     self.schedule(self.check_if_game_over)
     self.controller = controller
-    self.game_over_snd = game_mixer.Sound("sounds/gameover.wav")
+    self.game_over_snd = game_mixer.Sound("sounds/gameover.ogg")
 
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
@@ -175,10 +175,10 @@ class GameAction(Layer):
     bird_count = 5
 
     for i in range(0, rock_count):
-      self.obstacles.append(HittableObj("images/Rock.png", HittableObj.BOTTOM, game_mixer.Sound("sounds/ouch.wav")))
+      self.obstacles.append(HittableObj("images/Rock.png", HittableObj.BOTTOM, game_mixer.Sound("sounds/ouch.ogg")))
 
     for i in range(0, bird_count):
-      self.obstacles.append(HittableObj("images/Bird.png", HittableObj.TOP, game_mixer.Sound("sounds/ouch.wav")))
+      self.obstacles.append(HittableObj("images/Bird.png", HittableObj.TOP, game_mixer.Sound("sounds/ouch.ogg")))
 
     for obs in self.obstacles:
       self.add(obs)
@@ -188,10 +188,10 @@ class GameAction(Layer):
     coin_count_bottom = 10
 
     for i in range(0, coin_count_top):
-      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200, game_mixer.Sound("sounds/candy.wav")))
+      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200, game_mixer.Sound("sounds/candy.ogg")))
 
     for i in range(0, coin_count_bottom):
-      self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100, game_mixer.Sound("sounds/coin_pickup.wav")))
+      self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100, game_mixer.Sound("sounds/coin_pickup.ogg")))
 
     for item in self.items:
       self.add(item)
