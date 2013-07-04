@@ -12,27 +12,39 @@ from cocos.text import *
 import cocos.audio.pygame.music as game_music
 import cocos.audio.pygame.mixer as game_mixer
 
+#Initialize the pygame mixer
 cocos.audio.pygame.mixer.init()
 
+#Make the click button sound available globally
 clicked_button = game_mixer.Sound("sounds/clicked_button.ogg")
 
+"""
+  Class: All Scenes
+  Description: Holds all the scenes to be used by the game. Start, Instructions, Game, and Game Over scene.
+"""
 class AllScenes():
   def __init__(self):
     # Initialize the director
     cocos.director.director.init(width=1200, height=700)
     cocos.director.director.window.set_caption("Pinoy Skater")
 
-    # Create the main Scene
+    # Create all the scenes
     self.start_scene = StartScene(self)
     self.instructions_scene = InstructionsScene(self)
     self.game_scene = GameScene(self)
     self.game_over_scene = GameOverScene(self)
 
-    # Run the scene
+    # Play the game's soundtract
     game_music.load("sounds/bg.mp3")
     game_music.play(-1)
+
+    # Run the start scene
     cocos.director.director.run(self.start_scene)
 
+"""
+  Class: Game Scene
+  Description: Contains the moving background and game action. This is the main game content.
+"""
 class GameScene(Scene):
   WIDTH = 1200
   def __init__(self, controller):
