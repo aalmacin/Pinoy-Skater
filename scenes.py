@@ -14,6 +14,8 @@ import cocos.audio.pygame.mixer as game_mixer
 
 cocos.audio.pygame.mixer.init()
 
+clicked_button = game_mixer.Sound("sounds/clicked_button.ogg")
+
 class AllScenes():
   def __init__(self):
     # Initialize the director
@@ -27,7 +29,7 @@ class AllScenes():
     self.game_over_scene = GameOverScene(self)
 
     # Run the scene
-    game_music.load("sounds/bg.wav")
+    game_music.load("sounds/bg.mp3")
     game_music.play(-1)
     cocos.director.director.run(self.start_scene)
 
@@ -369,6 +371,7 @@ class StartScene(Scene):
 
   def switch_to_instructions_screen(self):
     cocos.director.director.replace(self.controller.instructions_scene)
+    clicked_button.play()
 
 class InstructionsScene(Scene):
   def __init__(self, controller):
@@ -402,6 +405,7 @@ class InstructionsScene(Scene):
 
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
+    clicked_button.play()
 
 class MoveByMouseLayer(Layer):
   is_event_handler = True
@@ -440,6 +444,7 @@ class GameOverScene(Scene):
 
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
+    clicked_button.play()
 
   def update_text(self):
     self.final_score_label.element.text = "Final Score: " + str(self.final_score)
