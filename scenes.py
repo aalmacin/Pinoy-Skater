@@ -27,7 +27,7 @@ class AllScenes():
     self.game_over_scene = GameOverScene(self)
 
     # Run the scene
-    game_music.load("sounds/startscreen_snd.wav")
+    game_music.load("sounds/bg.wav")
     game_music.play(-1)
     cocos.director.director.run(self.start_scene)
 
@@ -44,6 +44,7 @@ class GameScene(Scene):
 
     self.schedule(self.check_if_game_over)
     self.controller = controller
+    self.game_over_snd = game_mixer.Sound("sounds/gameover.wav")
 
   def check_if_game_over(self, *args, **kwargs):
     if self.game_action_layer.game_over == True:
@@ -52,6 +53,7 @@ class GameScene(Scene):
       self.controller.game_over_scene.update_text()
       self.reset()
       self.game_action_layer.game_over = False
+      self.game_over_snd.play()
 
   def reset(self):
     self.moving_bg.reset()
