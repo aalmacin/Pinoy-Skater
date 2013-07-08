@@ -385,30 +385,48 @@ class GameAction(Layer):
     for item in self.items:
       item.reset()
 
+"""
+  Class: Skater
+  Description: The main character in the game.
+               The Skater changes layer base on the user's input.
+"""
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
   X = 100
   Y = 130
+  # Constants that hold the different positions
   MAIN = 0
   JUMP = 1
   SIT = 2
 
   def __init__(self):
     layers = []
+    # Append a layer with sprite to layers for each filename.
     for file_name in Skater.IMG_FILENAMES:
       temp_layer = Layer()
       temp_layer.add(Sprite(file_name, anchor=(0,0)))
       layers.append(temp_layer)
 
+    # Create the multiplex layer with the layers created
     super(Skater, self).__init__(*layers)
 
+    # Set the y of the skater to the constant Y
     self.y = Skater.Y
+
+    # The skater is not performing anything.
     self.performing = False
 
+    # Show the correct image all the time. Updates when needed.
     self.schedule(self.show_correct_img)
 
+  """
+    Method: Jump
+    Description: Makes the skater jump for a second.
+  """
   def jump(self):
+    # If the skater is not performing(Jumping, sitting) and the y of the skater is on the appropriate position for a jump.
     if not self.performing and self.y == Skater.Y:
+      # Switch images, set performing to true while jumping, and Make the sprite jump
       self.switch_to(Skater.JUMP)
       self.performing = True
       jump_height = Skater.Y + 30
@@ -416,14 +434,26 @@ class Skater(MultiplexLayer):
       jump_protection = Lerp("performing", True, False, 1)
       self.do(jump_action | jump_protection)
 
+  """
+    Method: Sit
+    Description: Shows the skater in sitting position.
+  """
   def sit(self):
     if not self.performing and self.y == Skater.Y:
       self.performing = True
       self.switch_to(Skater.SIT)
 
+  """
+    Method: To normal
+    Description: Puts the skater back to normal position.
+  """
   def to_normal(self):
     self.switch_to(Skater.MAIN)
 
+  """
+    Method: Show correct img
+    Description: Shows the image to show the user.
+  """
   def show_correct_img(self, *args, **kwargs):
     if not self.performing and self.y == Skater.Y:
       self.to_normal()
