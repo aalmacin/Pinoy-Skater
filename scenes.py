@@ -50,32 +50,57 @@ class GameScene(Scene):
   def __init__(self, controller):
     super(GameScene, self).__init__()
 
+    # Create the moving parallax bg and the game layer
     self.moving_bg = MovingBackground()
     self.game_action_layer = GameAction()
 
+    # Add the bg and game layer with the bg at the back
     self.add(self.moving_bg, z=0)
     self.add(self.game_action_layer, z=1)
 
+    # Have a scheduled method check if the game is over
     self.schedule(self.check_if_game_over)
     self.controller = controller
+
+    # Initialize sounds
     self.game_over_snd = game_mixer.Sound("sounds/gameover.ogg")
 
+  """
+    Method: Check if game over
+    Description: A scheduled method that checks if the game is over (The player run out of life).
+  """
   def check_if_game_over(self, *args, **kwargs):
+    # If game over
     if self.game_action_layer.game_over == True:
+      # Replace the scene to the game over scene
       cocos.director.director.replace(self.controller.game_over_scene)
+      # Set the final score in the game over scene to the current score in the scorer.
       self.controller.game_over_scene.final_score = self.game_action_layer.scorer.score
+      # Update the text (Holds the score) in the game over scene.
       self.controller.game_over_scene.update_text()
+      # Reset the game scene to make sure that it become reusable
       self.reset()
+      # Reset game over.
       self.game_action_layer.game_over = False
+      # Play the game over sound
       self.game_over_snd.play()
 
+  """
+    Method: Reset
+    Description: Reset the moving background and the game action layer
+  """
   def reset(self):
     self.moving_bg.reset()
     self.game_action_layer.reset()
 
+"""
+  Class: Moving Background
+  Description: The parallax background at the back of the main game action layer.
+"""
 class MovingBackground(Layer):
   def __init__(self):
     super(MovingBackground, self).__init__()
+    #Set all the sprites in the moving bg
     self.non_moving_bg = Sprite("images/NonMovingBG.png", anchor=(0,0))
 
     self.clouds = [
@@ -93,30 +118,44 @@ class MovingBackground(Layer):
         Sprite("images/Road_02.png", anchor=(0,0))
     ]
 
+    # Set the parallax backgrounds (bgs that move).
     self.parallax_bgs = [self.clouds, self.mountains, self.road]
+    # Set the speed of movement of the clouds, mountains, and road
     self.parallax_speed = [1, 5, 100]
 
+    # Set the x positions of the backgrounds to make sure that two bg are connected.
     self.positions = [0, GameScene.WIDTH]
 
+    # Add the non moving background
     self.add(self.non_moving_bg)
 
+    # Add each background to the screen and position them with the positions var.
     for bg in self.parallax_bgs:
       for i in range(0, len(bg)):
         bg_img = bg[i]
         bg_img.x = self.positions[i]
         self.add(bg_img)
 
-    self.interval = 0.1
+    # Move the images every .1 second
+    self.schedule_interval(self.move, 0.1)
 
-    self.schedule_interval(self.move, self.interval)
-
+  """
+    Method: Move
+    Description: Moves and adjusts the backgrounds.
+  """
   def move(self, *args, **kwargs):
+    # Moves the backgrounds base on the speed of each bg
+    # and reset the background when reached the end of the image.
     for i in range(0, len(self.parallax_speed)):
       for obj in self.parallax_bgs[i]:
         obj.x -= self.parallax_speed[i]
         if obj.x == -GameScene.WIDTH:
           obj.x = GameScene.WIDTH
 
+  """
+    Method: Reset
+    Description: Reset the parallax bgs to their initial state.
+  """
   def reset(self):
     for bg in self.parallax_bgs:
       for i in range(0, len(bg)):
