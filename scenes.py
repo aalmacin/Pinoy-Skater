@@ -277,7 +277,7 @@ class GameAction(Layer):
     coin_count_bottom = 10
 
     for i in range(0, coin_count_top):
-      self.items.append(Item("images/Candy.png", HittableObj.CANDY_TOP, 200, game_mixer.Sound("sounds/candy.ogg")))
+      self.items.append(Item("images/Candy.png", HittableObj.VERY_TOP, 200, game_mixer.Sound("sounds/candy.ogg")))
 
     for i in range(0, coin_count_bottom):
       self.items.append(Item("images/Coin.png", HittableObj.BOTTOM, 100, game_mixer.Sound("sounds/coin_pickup.ogg")))
@@ -458,20 +458,36 @@ class Skater(MultiplexLayer):
     if not self.performing and self.y == Skater.Y:
       self.to_normal()
 
+"""
+  Class: HittableObj
+  Description: An object that gets hit by the skater.
+"""
 class HittableObj(CocosNode):
   BOTTOM = (1200, 130)
   TOP = (1200, 300)
-  CANDY_TOP = (1200, 400)
+  VERY_TOP = (1200, 400)
   def __init__(self, image_name, pos, sound):
     super(HittableObj, self).__init__()
+    # Create the sprite of the hittable object and position it
     self.sprite = Sprite(image_name, anchor=(0,0))
     self.sprite.position = pos
     self.add(self.sprite)
+
+    # Initialize dynamic values
     self.performing = False
     self.speed = 0
+
+    # Move the object
     self.schedule(self.move)
+
+    # Initialize the sound produced when hit
     self.sound = sound
 
+  """
+    Method: Move
+    Description: When performing is set to True,
+                 decrease the x of the object. Reset the object's position when reached the leftmost of the window.
+  """
   def move(self, *args, **kwargs):
     if self.performing:
       self.sprite.x -= self.speed
@@ -479,92 +495,151 @@ class HittableObj(CocosNode):
     if self.sprite.x <= -self.sprite.width:
       self.reset()
 
+  """
+    Method: Reset
+    Description: Put the object back to where it initially is.
+  """
   def reset(self):
     self.sprite.x = 1200
     self.performing = False
 
+  """
+    Method: Play sound
+    Description: Play the sound when the object is hit.
+  """
   def play_sound(self):
     self.sound.play()
 
+"""
+  Class: Item
+  Description: Child class of HittableObj which has an additional field (points).
+               Points is how much points the user receives when the item is hit.
+"""
 class Item(HittableObj):
   def __init__(self, image_name, pos, points, sound):
     super(Item, self).__init__(image_name, pos, sound)
     self.points = points
 
+"""
+  Class: Life Holder
+  Description: Holds images of lives and lives left for the user.
+"""
 class LifeHolder(Layer):
   IMAGE_NAME = "images/Heart.png"
   def __init__(self):
     super(Layer, self).__init__()
+    # lives to 3
     self.lives = 3
+    # Set the x position of each image
     self.x_pos = [10, 65, 120]
+
+    # For each life, set its position and create its sprite.
     for i in range(0, self.lives):
       temp_sprite = Sprite(LifeHolder.IMAGE_NAME, anchor=(0,0))
       temp_sprite.x = self.x_pos[i]
       temp_sprite.y = 20
       self.add(temp_sprite, name=str(i))
 
+  """
+    Method: Update Image
+    Description: Update the images by hiding the one on the visible rightmost position.
+  """
   def update_image(self):
     if self.lives < 3:
       self.get(str(self.lives)).visible = False
 
+  """
+    Method: Reset
+    Description: Reset the images by showing all of them again.
+  """
   def reset(self):
     self.lives = 3
     for i in range(0, 3):
       self.get(str(i)).visible = True
 
+"""
+  Class: Start Scene
+  Description: The start scene that shows a background and start button.
+"""
 class StartScene(Scene):
   def __init__(self, controller):
     super(StartScene, self).__init__()
 
+    # Create the menu
     self.menu = Menu()
     start_button = ImageMenuItem("images/StartButton.png", self.switch_to_instructions_screen)
     start_button.scale = 2
     start_button.y = -200
     menu_items = [start_button]
-
     self.menu.create_menu(menu_items)
+
+    # Add the bg image and menu
     self.add(Sprite("images/StartScreenImage.png", anchor=(0,0)), z=0)
     self.add(self.menu, z=1)
+
+    # Set the controller field
     self.controller = controller
 
+  """
+    Method: Switch to Instructions Screen
+    Description: Switches to instructions screen and play the clicked button sound.
+                 Called only when the start button is pressed.
+  """
   def switch_to_instructions_screen(self):
     cocos.director.director.replace(self.controller.instructions_scene)
     clicked_button.play()
 
+"""
+  Class: Instructions Scene
+  Description: The instructions scene that shows the user how to play the game.
+"""
 class InstructionsScene(Scene):
   def __init__(self, controller):
     super(InstructionsScene, self).__init__()
 
+    # Creates the bg image, moving layer, and images used to mask the instructions
     self.instructions_image = Sprite("images/InstructionsImage.png", anchor=(0,0))
-    self.instructions_content_image = Sprite("images/Instructions.png", anchor=(0,1800))
-    self.instructions_image_mask_top = Sprite("images/InstructionsMaskTop.png", anchor=(0,0))
-    self.instructions_image_mask = Sprite("images/InstructionsMask.png", anchor=(0,0))
-    self.instructions_content = MoveByMouseLayer(self.instructions_content_image)
 
+    self.instructions_image_mask_top = Sprite("images/InstructionsMaskTop.png", anchor=(0,0))
+    self.instructions_image_mask_top.y = 650
+
+    self.instructions_image_mask = Sprite("images/InstructionsMask.png", anchor=(0,0))
+
+    self.instructions_content_image = Sprite("images/Instructions.png", anchor=(0,1800))
+    self.instructions_content = MoveByMouseLayer(self.instructions_content_image)
     self.instructions_content.x = 73
     self.instructions_content.y = 50
 
-    self.instructions_image_mask_top.y = 650
-
+    # Create the menu
     self.menu = Menu()
     play_button = ImageMenuItem("images/InstructionsButton.png", self.switch_to_game_screen)
     play_button.y = -300
     play_button.scale = 1.5
-
     menu_items = [play_button]
     self.menu.create_menu(menu_items)
 
+    # Add the objects to the scene
     self.add(self.instructions_image, z=0)
     self.add(self.instructions_content, z=1)
     self.add(self.instructions_image_mask_top, z=2)
     self.add(self.instructions_image_mask, z=3)
     self.add(self.menu, z=4)
+
     self.controller = controller
 
+  """
+    Method: Switch to Game Screen
+    Description: Switches to game screen and play the clicked button sound.
+                 Called only when the play button is pressed.
+  """
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
     clicked_button.play()
 
+"""
+  Class: Move by mouse layer
+  Description: Layer that changes position of a content image base on the mouse position when mouse motioned.
+"""
 class MoveByMouseLayer(Layer):
   is_event_handler = True
   def __init__(self, content_image):
@@ -572,41 +647,66 @@ class MoveByMouseLayer(Layer):
     self.content_image = content_image
     self.add(self.content_image)
 
+  """
+    Method: On mouse motion
+    Description: Updates the position of the content image. Makes a scrolling effect.
+  """
   def on_mouse_motion(self, x, y, dx, dy):
     if y >= cocos.director.director.window.height/2 and self.content_image.y >= 0:
       self.content_image.y -= 10
     elif y < cocos.director.director.window.height/2 and self.content_image.y < 1900:
       self.content_image.y += 10
 
+"""
+  Class: Game Over Scene
+  Description: The Game Over scene that shows the user how much score he earned and a button to play again.
+"""
 class GameOverScene(Scene):
   def __init__(self, controller):
     super(GameOverScene, self).__init__()
+    # Set the position where the text will be
     self.text_pos = (cocos.director.director.window.width/2,cocos.director.director.window.height/2)
 
+    # Create the menu
     self.menu = Menu()
     restart_button = ImageMenuItem("images/RestartButton.png", self.switch_to_game_screen)
     menu_items = [restart_button]
     restart_button.scale = 2
     restart_button.y = -200
-
     self.menu.create_menu(menu_items)
-    self.add(Sprite("images/GameOverScreenImage.png", anchor=(0,0)), z=0)
-    self.add(self.menu, z=1)
-    self.controller = controller
 
+    # Create the layer that holds the final score.
     self.score_layer = Layer()
     self.final_score = 0
     self.final_score_label = Label(text="Final Score: 0", font_size=32, position=self.text_pos, anchor_x="center", anchor_y="center", color=(255, 30, 30, 200))
     self.score_layer.add(self.final_score_label)
+
+    self.add(Sprite("images/GameOverScreenImage.png", anchor=(0,0)), z=0)
+    self.add(self.menu, z=1)
     self.add(self.score_layer, z=2)
 
+    self.controller = controller
+
+  """
+    Method: Switch to Game Screen
+    Description: Switches to game screen and play the clicked button sound.
+                 Called only when the restart button is pressed.
+  """
   def switch_to_game_screen(self):
     cocos.director.director.replace(self.controller.game_scene)
     clicked_button.play()
 
+  """
+    Method: Update Text
+    Description: Update the text to the final score the user gathered.
+  """
   def update_text(self):
     self.final_score_label.element.text = "Final Score: " + str(self.final_score)
 
+"""
+  Class: Scorer
+  Description: Holds the score the user currently earned.
+"""
 class Scorer(CocosNode):
   TEXT_POS = (10, 650)
   def __init__(self):
@@ -615,5 +715,9 @@ class Scorer(CocosNode):
     self.scorer = Label(text="Score: 0", font_size=32, position=Scorer.TEXT_POS)
     self.add(self.scorer)
 
+  """
+    Method: Update Text
+    Description: Update the text to the score the user gathered.
+  """
   def update_text(self):
     self.scorer.element.text = "Score: " + str(self.score)

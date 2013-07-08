@@ -1,7 +1,10 @@
 import cocos
 from scenes import *
 
-# Start the game
+"""
+  Function: main
+  Description: Start the game by making an instance of all scenes
+"""
 def main():
   all_scenes = AllScenes()
 
