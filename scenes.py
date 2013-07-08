@@ -160,69 +160,101 @@ class MovingBackground(Layer):
     for bg in self.parallax_bgs:
       for i in range(0, len(bg)):
         bg_img = bg[i]
-        bg_img.x = self.positions[i]
 
+"""
+  Class: Game Action
+  Description: The main layer that holds all the Items seen in the main game.
+               The main logic of the game is also stored in this game action.
+               The main objects are, main_char, life_holder, scorer, obstacles, and items
+"""
 class GameAction(Layer):
+  # Sets this layer as event handler
   is_event_handler = True
   def __init__(self):
     super(GameAction, self).__init__()
 
+    # Sets the speed & interval of objects and time elapsed to their initial value
     self.objects_speed = 10
     self.obstacles_interval = 3
     self.items_interval = 1
     self.half_minute_count = 1
     self.seconds_played = 1
 
+    # Create the main character and position it.
     self.main_char = Skater()
     self.main_char.x = 100
+    self.add(self.main_char)
+
+    # Set game over to False
     self.game_over = False
 
-    self.score_given = 100
+    # Create the life holder object
     self.life_holder = LifeHolder()
     self.add(self.life_holder)
 
-    self.add(self.main_char)
+    # Create the obstacles
     self.obstacles = []
     self.setup_obstacles()
 
+    # Create the items
     self.items = []
     self.setup_items()
 
+    # Every second, count the time played and throw objects
     self.schedule_interval(self.count_time_played, 1)
     self.schedule_interval(self.throw_objects, 1)
+
+    # Check for collisions all the time
     self.schedule(self.check_collisions)
 
+    # Create the scorer
     self.scorer = Scorer()
     self.add(self.scorer)
 
+    # Create the graphic to be shown when the skater is hit
     self.hit_graphic = Sprite("images/Hit.png", anchor=(0,0))
     self.add(self.hit_graphic, z=10)
     self.hit_graphic.visible = False
 
+  """
+    Method: Throw objects
+    Description: Throw obstacles and items in the direction of the user.
+                 Random select which kind of obstacle or item to throw.
+  """
   def throw_objects(self, *args, **kwargs):
+    # For every obstacle's or item's interval seconds
     if self.seconds_played % self.obstacles_interval == 0:
-      obj_selected = False
-      while not obj_selected:
-        obj = choice(self.obstacles)
-        if obj.performing == False:
-          obj.performing = True
-          obj.speed = self.objects_speed + (self.half_minute_count * 5)
-          obj_selected = True
+      objects = self.obstacles
     elif self.seconds_played % self.items_interval == 0:
-      item_selected = False
-      while not item_selected:
-        item = choice(self.items)
-        if item.performing == False:
-          item.performing = True
-          item.speed = self.objects_speed + (self.half_minute_count * 5)
-          item_selected = True
+      objects = self.items
 
+    # While there is no object to throw yet,
+    obj_selected = False
+    while not obj_selected:
+      # Randomly select an object
+      obj = choice(objects)
+      # If the object selected is not yet moving/performing,
+      if obj.performing == False:
+        # Set performing to True
+        obj.performing = True
+        # Move
+        obj.speed = self.objects_speed + (self.half_minute_count * 5)
+        obj_selected = True
+
+  """
+    Method: Count time played
+    Description: Count how much time the player played.
+                 Increase the half minute count every 30 seconds which affects the speed of the items.
+  """
   def count_time_played(self, *args, **kwargs):
     self.seconds_played += 1
-    # Increase speed every 30 seconds
     if self.seconds_played % 30 == 0:
       self.half_minute_count += 1
 
+  """
+    Method: Setup obstacles
+    Description: Set up the obstacles objects to be used by the game layer.
+  """
   def setup_obstacles(self):
     rock_count = 5
     bird_count = 5
@@ -236,6 +268,10 @@ class GameAction(Layer):
     for obs in self.obstacles:
       self.add(obs)
 
+  """
+    Method: Setup items
+    Description: Set up the item (candy/coin) objects to be used by the game layer.
+  """
   def setup_items(self):
     coin_count_top = 5
     coin_count_bottom = 10
@@ -249,7 +285,10 @@ class GameAction(Layer):
     for item in self.items:
       self.add(item)
 
-  # Mouse or keyboard for controls
+  """
+    Method: On mouse motion
+    Description: Checks when the mouse moves and moves the main character base on the pointer's position.
+  """
   def on_mouse_motion(self, x, y, dx, dy):
     if y > 400:
       self.main_char.jump()
@@ -258,55 +297,93 @@ class GameAction(Layer):
     elif y <= 120:
       self.main_char.sit()
 
+  """
+    Method: On key press
+    Description: Checks when the user hits w or s key and moves the main character.
+                 W - The main char jumps.
+                 S - The main char sits.
+  """
   def on_key_press(self, key, modifiers):
     if key == keyboard_key.W:
       self.main_char.jump()
     elif key == keyboard_key.S:
       self.main_char.sit()
 
+  """
+    Method: On key release.
+    Description: When S is released, remove the main character from sitting position."
+  """
   def on_key_release(self, key, modifiers):
     if key == keyboard_key.S:
       self.main_char.performing = False
 
+  """
+    Method: Check collisions
+    Description: Check if the main character hit an object.
+                 When hit, do the appropriate action.
+  """
   def check_collisions(self, *args, **kwargs):
+    # Check each obstacle base on the sprite's position.
     for obstacle in self.obstacles:
       main_obj = self.main_char.get_children()[0].get_children()[0]
       hit_x = obstacle.sprite.x in range(int(self.main_char.x), int(self.main_char.x) + main_obj.width - 50)
       hit_y = obstacle.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
+      # If the obstacle hits both x and y range,
       if hit_x and hit_y:
+        # Show the hit graphic
         self.hit_graphic.position = (self.main_char.x + obstacle.sprite.width, obstacle.sprite.y)
         self.hit_graphic.do(Lerp("visible", True, False, 0.5))
+        # Reset the obstacle.
         obstacle.reset()
+        # Play the obstacle sound.
         obstacle.play_sound()
+        # Decrease the life in life_holder and update the image
         self.life_holder.lives -= 1
         self.life_holder.update_image()
+        # When lives is depleted, set game over to true
         if self.life_holder.lives == 0:
           self.game_over = True
 
+    # Check each item base on the sprite's position
     for item in self.items:
       main_obj = self.main_char.get_children()[0].get_children()[0]
       hit_x = item.sprite.x in range(int(self.main_char.x), int(self.main_char.x) + main_obj.width - 50)
       hit_y = item.sprite.y in range(int(self.main_char.y), int(self.main_char.y) + main_obj.height)
+      # If the obstacle hits both x and y range,
       if hit_x and hit_y:
+        # Reset the item.
         item.reset()
+        # Play the item sound.
         item.play_sound()
+        # Increase the score in scorer and update the text
         self.scorer.score += item.points
         self.scorer.update_text()
 
+  """
+    Method: Reset
+    Description: Resets the dynamic values in Game Action.
+  """
   def reset(self):
+    # Resets the life holder
     self.life_holder.reset()
+    # Reset dynamic values
     self.game_over = False
     self.objects_speed = 10
     self.obstacles_interval = 3
     self.items_interval = 1
     self.half_minute_count = 1
     self.seconds_played = 1
+    # Reset scorer
     self.score = 0
     self.scorer.score = 0
     self.scorer.update_text()
     self.hit_graphic.visible = False
+    # Reset each obstacle
     for obs in self.obstacles:
       obs.reset()
+    # Reset each item
+    for item in self.items:
+      item.reset()
 
 class Skater(MultiplexLayer):
   IMG_FILENAMES = ["images/Skater.png", "images/SkaterJump.png", "images/SkaterSitting.png"]
