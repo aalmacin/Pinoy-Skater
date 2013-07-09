@@ -721,3 +721,12 @@ class Scorer(CocosNode):
   """
   def update_text(self):
     self.scorer.element.text = "Score: " + str(self.score)
+
+"""
+  Function: main
+  Description: Start the game by making an instance of all scenes
+"""
+def main():
+  all_scenes = AllScenes()
+
+if __name__ == "__main__": main()
