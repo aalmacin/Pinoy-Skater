@@ -1,0 +1,4 @@
+# Modern requirements for Pinoy Skater (pinoy-skater_4.py)
+# Compatible with Python 3.13.5+
+
+arcade>=3.0.0
