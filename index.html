@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinoy Skater - A Filipino Skateboarding Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .tagline {
+            font-size: 1.5em;
+            opacity: 0.9;
+        }
+
+        .hero-image {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin: 30px 0;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .download-section {
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            margin: 20px 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .instructions h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul {
+            list-style-position: inside;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+        }
+
+        .system-requirements {
+            margin-top: 20px;
+        }
+
+        .req-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .tagline {
+                font-size: 1.2em;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            .download-btn {
+                padding: 15px 30px;
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛹 Pinoy Skater</h1>
+            <p class="tagline">An Exciting Filipino Skateboarding Adventure</p>
+        </header>
+
+        <div class="hero-image">
+            <img src="images/StartScreenImage.png" alt="Pinoy Skater Game Screenshot">
+        </div>
+
+        <div class="section download-section">
+            <h2>Download Now!</h2>
+            <p style="font-size: 1.2em; margin: 20px 0;">Get ready to skate through the streets of the Philippines!</p>
+            <a href="https://github.com/aalmacin/Pinoy-Skater/releases/latest/download/PinoySkater-Windows.zip" class="download-btn">
+                🪟 Download for Windows
+            </a>
+            <a href="https://github.com/aalmacin/Pinoy-Skater/releases/latest/download/PinoySkater-Linux.zip" class="download-btn">
+                🐧 Download for Linux
+            </a>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                <small>Don't see a release yet? Check the <a href="https://github.com/aalmacin/Pinoy-Skater/releases" style="color: #ffd700;">Releases page</a></small>
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>About the Game</h2>
+            <p style="font-size: 1.2em;">
+                Pinoy Skater is an exciting endless runner game where you control a Filipino skateboarder
+                navigating through obstacles, collecting coins, and avoiding hazards. Test your reflexes
+                and see how far you can go!
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>🎮 Simple Controls</h3>
+                    <p>Easy to learn, hard to master. Jump and duck to avoid obstacles!</p>
+                </div>
+                <div class="feature">
+                    <h3>🪙 Collect Coins</h3>
+                    <p>Gather coins and power-ups as you skate through the streets.</p>
+                </div>
+                <div class="feature">
+                    <h3>🎵 Awesome Music</h3>
+                    <p>Enjoy the energetic soundtrack as you play.</p>
+                </div>
+                <div class="feature">
+                    <h3>🏆 High Scores</h3>
+                    <p>Compete with yourself and beat your best score!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How to Play</h2>
+            <div class="instructions">
+                <h3>Controls:</h3>
+                <ul>
+                    <li><strong>UP Arrow</strong> or <strong>SPACE</strong> - Jump over obstacles</li>
+                    <li><strong>DOWN Arrow</strong> - Duck under obstacles</li>
+                    <li><strong>ESC</strong> - Pause/Menu</li>
+                </ul>
+            </div>
+            <div class="instructions">
+                <h3>Gameplay:</h3>
+                <ul>
+                    <li>🪙 Collect <strong>coins</strong> to increase your score</li>
+                    <li>🍬 Grab <strong>candies</strong> for special bonuses</li>
+                    <li>❤️ Collect <strong>hearts</strong> to gain extra lives</li>
+                    <li>⚠️ Avoid <strong>rocks</strong> and <strong>birds</strong> - they'll hurt you!</li>
+                    <li>💯 Survive as long as possible to get the highest score</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Installation Instructions</h2>
+            <div class="instructions">
+                <h3>Windows:</h3>
+                <ul>
+                    <li>1. Download the Windows .zip file</li>
+                    <li>2. Extract the archive to a folder of your choice</li>
+                    <li>3. Run <strong>PinoySkater.exe</strong></li>
+                    <li>4. Enjoy the game!</li>
+                </ul>
+            </div>
+            <div class="instructions">
+                <h3>Linux:</h3>
+                <ul>
+                    <li>1. Download the Linux .zip file</li>
+                    <li>2. Extract the archive: <code>unzip PinoySkater-Linux.zip</code></li>
+                    <li>3. Navigate to the folder: <code>cd PinoySkater</code></li>
+                    <li>4. Make executable: <code>chmod +x PinoySkater</code></li>
+                    <li>5. Run: <code>./PinoySkater</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>System Requirements</h2>
+            <div class="system-requirements">
+                <div class="req-item">
+                    <strong>OS:</strong> Windows 7/8/10/11 or Linux (Ubuntu 18.04+)
+                </div>
+                <div class="req-item">
+                    <strong>Memory:</strong> 2 GB RAM
+                </div>
+                <div class="req-item">
+                    <strong>Graphics:</strong> Any graphics card with OpenGL 2.0+ support
+                </div>
+                <div class="req-item">
+                    <strong>Storage:</strong> 100 MB available space
+                </div>
+                <div class="req-item">
+                    <strong>Sound:</strong> Sound card for audio playback
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Build From Source</h2>
+            <p style="font-size: 1.1em; margin-bottom: 20px;">
+                Want to build the game yourself? Check out the
+                <a href="https://github.com/aalmacin/Pinoy-Skater" style="color: #ffd700; text-decoration: none;">
+                    GitHub Repository
+                </a>
+            </p>
+            <div class="instructions">
+                <h3>Quick Build:</h3>
+                <ul>
+                    <li>1. Clone the repository</li>
+                    <li>2. Install Python 3.7+</li>
+                    <li>3. Run: <code>bash build.sh</code></li>
+                    <li>4. Find your executable in the <code>dist/PinoySkater</code> folder</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p style="font-size: 1.2em; margin-bottom: 10px;">
+                Made with ❤️ using Python and Cocos2d
+            </p>
+            <p>
+                <a href="https://github.com/aalmacin/Pinoy-Skater" style="color: #ffd700; text-decoration: none;">
+                    View on GitHub
+                </a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
