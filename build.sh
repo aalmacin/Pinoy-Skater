@@ -5,7 +5,7 @@ echo "Installing dependencies..."
 pip install -r requirements.txt
 pip install pyinstaller
 
-echo "Building executable..."
-pyinstaller pinoy-skater.spec
+echo "Building executable for Pinoy Skater (Arcade version)..."
+pyinstaller pinoy-skater_4.spec
 
 echo "Build complete! Executable is in the 'dist/PinoySkater' folder"

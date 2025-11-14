@@ -38,7 +38,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller pinoy-skater.spec
+          pyinstaller pinoy-skater_4.spec
 
       - name: Create archive (Linux)
         if: matrix.os == 'ubuntu-latest'
