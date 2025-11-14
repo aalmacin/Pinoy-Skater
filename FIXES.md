@@ -38,11 +38,21 @@
 - Uses actual position values (not sprite centers) for accurate detection
 
 ### 5. Arcade 3.x API Changes
-**Problem**: `sprite.draw()` method doesn't exist in Arcade 3.x.
+**Problem**: `sprite.draw()` and `arcade.draw_rectangle_filled()` methods don't exist in Arcade 3.x.
 
 **Solution**:
 - Changed all `sprite.draw()` calls to `arcade.draw_sprite(sprite)`
+- Changed `arcade.draw_rectangle_filled(cx, cy, w, h, color)` to `arcade.draw_lrbt_rectangle_filled(left, right, bottom, top, color)`
+- Note: LRBT stands for Left-Right-Bottom-Top
 - Applied to GameObject, Player, ParallaxLayer, and all UI elements
+
+### 6. Game Over Screen Readability
+**Problem**: Text on game over screen was hard to read against the background image.
+
+**Solution**:
+- Added semi-transparent dark overlay (black with 180/255 alpha) over the background
+- Overlay drawn after background but before text
+- Makes white text clearly visible while still showing background image
 
 ## Key Implementation Details
 

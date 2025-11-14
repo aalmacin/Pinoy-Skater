@@ -379,6 +379,7 @@ class PinoySkaterGame(arcade.Window):
                 self.obstacles.append(
                     Obstacle("images/Bird.png", TOP_Y, "sounds/ouch.ogg")
                 )
+            print(f"Created {len(self.obstacles)} obstacles")
         except FileNotFoundError as e:
             print(f"Warning: Could not load obstacle images: {e}")
 
@@ -395,6 +396,7 @@ class PinoySkaterGame(arcade.Window):
                 self.items.append(
                     Item("images/Coin.png", BOTTOM_Y, 100, "sounds/coin_pickup.ogg")
                 )
+            print(f"Created {len(self.items)} items")
         except FileNotFoundError as e:
             print(f"Warning: Could not load item images: {e}")
 
@@ -461,9 +463,8 @@ class PinoySkaterGame(arcade.Window):
                                    center_y=SCREEN_HEIGHT // 2)
             arcade.draw_sprite(inst_bg)
         except:
-            arcade.draw_rectangle_filled(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
-                                        SCREEN_WIDTH, SCREEN_HEIGHT,
-                                        arcade.color.DARK_BLUE)
+            arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT,
+                                             arcade.color.DARK_BLUE)
 
         # Draw instructions text
         arcade.draw_text("HOW TO PLAY",
@@ -497,13 +498,17 @@ class PinoySkaterGame(arcade.Window):
             layer.draw()
 
         # Draw obstacles
+        performing_obstacles = 0
         for obstacle in self.obstacles:
             if obstacle.performing:
+                performing_obstacles += 1
                 obstacle.draw()
 
         # Draw items
+        performing_items = 0
         for item in self.items:
             if item.performing:
+                performing_items += 1
                 item.draw()
 
         # Draw player
@@ -533,9 +538,12 @@ class PinoySkaterGame(arcade.Window):
                                        center_y=SCREEN_HEIGHT // 2)
             arcade.draw_sprite(gameover_bg)
         except:
-            arcade.draw_rectangle_filled(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
-                                        SCREEN_WIDTH, SCREEN_HEIGHT,
-                                        arcade.color.DARK_RED)
+            arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT,
+                                             arcade.color.DARK_RED)
+
+        # Draw semi-transparent overlay to make text more visible
+        arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT,
+                                         (0, 0, 0, 180))  # Black with 180/255 alpha (semi-transparent)
 
         # Draw game over text
         arcade.draw_text("GAME OVER",
@@ -619,7 +627,11 @@ class PinoySkaterGame(arcade.Window):
         if available:
             obstacle = random.choice(available)
             obstacle.performing = True
-            obstacle.reset()
+            # Reset position but keep performing as True
+            obstacle.x = SCREEN_WIDTH
+            obstacle.sprite.center_x = obstacle.x + obstacle.sprite.width / 2
+            obstacle.sprite.center_y = obstacle.initial_y + obstacle.sprite.height / 2
+            print(f"Spawned obstacle at x={obstacle.x}, y={obstacle.initial_y}, performing={obstacle.performing}")
 
     def spawn_item(self):
         """Spawn a random item"""
@@ -628,7 +640,11 @@ class PinoySkaterGame(arcade.Window):
         if available:
             item = random.choice(available)
             item.performing = True
-            item.reset()
+            # Reset position but keep performing as True
+            item.x = SCREEN_WIDTH
+            item.sprite.center_x = item.x + item.sprite.width / 2
+            item.sprite.center_y = item.initial_y + item.sprite.height / 2
+            print(f"Spawned item at x={item.x}, y={item.initial_y}, performing={item.performing}")
 
     def check_collisions(self):
         """Check for collisions between player and objects"""

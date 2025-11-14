@@ -161,7 +161,23 @@ sprite_list.append(sprite)
 sprite_list.draw()
 ```
 
-This is a **breaking change** from Arcade 2.x and is important to know if you're updating existing Arcade code.
+**Rectangle Drawing in Arcade 3.x:**
+
+The rectangle drawing function has changed:
+
+```python
+# OLD (Arcade 2.x)
+arcade.draw_rectangle_filled(center_x, center_y, width, height, color)
+
+# NEW (Arcade 3.x)
+arcade.draw_lrbt_rectangle_filled(left, right, bottom, top, color)
+# Note: LRBT = Left, Right, Bottom, Top
+
+# Example: full screen rectangle
+arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, color)
+```
+
+These are **breaking changes** from Arcade 2.x and are important to know if you're updating existing Arcade code.
 
 ## Dependencies Comparison
 
