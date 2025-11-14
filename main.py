@@ -374,6 +374,13 @@ class PinoySkaterGame:
         except pygame.error as e:
             print(f"Warning: Could not load sound files: {e}")
 
+        # Load background music
+        try:
+            pygame.mixer.music.load("sounds/bg.ogg")
+            pygame.mixer.music.set_volume(0.5)  # Set to 50% volume
+        except pygame.error as e:
+            print(f"Warning: Could not load background music: {e}")
+
         # Setup start screen
         self.setup_start_screen()
 
@@ -423,6 +430,13 @@ class PinoySkaterGame:
         self.heart_interval = random.uniform(20.0, 30.0)  # Random 20-30 seconds
         self.speed_multiplier = 1.0
         self.parallax_timer = 0
+
+        # Start background music (loop indefinitely)
+        try:
+            if not pygame.mixer.music.get_busy():
+                pygame.mixer.music.play(-1)
+        except pygame.error as e:
+            print(f"Warning: Could not play background music: {e}")
 
         # Create player
         self.player = Player()
