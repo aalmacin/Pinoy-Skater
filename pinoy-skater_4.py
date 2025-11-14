@@ -23,7 +23,7 @@ SPEED_INCREASE_INTERVAL = 30.0
 # Player constants
 PLAYER_X = 100
 PLAYER_Y = 130
-JUMP_HEIGHT = 30
+JUMP_HEIGHT = 100  # Increased to 100 to easily clear rocks
 JUMP_DURATION = 1.0
 
 # Position constants
@@ -379,7 +379,6 @@ class PinoySkaterGame(arcade.Window):
                 self.obstacles.append(
                     Obstacle("images/Bird.png", TOP_Y, "sounds/ouch.ogg")
                 )
-            print(f"Created {len(self.obstacles)} obstacles")
         except FileNotFoundError as e:
             print(f"Warning: Could not load obstacle images: {e}")
 
@@ -396,7 +395,6 @@ class PinoySkaterGame(arcade.Window):
                 self.items.append(
                     Item("images/Coin.png", BOTTOM_Y, 100, "sounds/coin_pickup.ogg")
                 )
-            print(f"Created {len(self.items)} items")
         except FileNotFoundError as e:
             print(f"Warning: Could not load item images: {e}")
 
@@ -498,17 +496,13 @@ class PinoySkaterGame(arcade.Window):
             layer.draw()
 
         # Draw obstacles
-        performing_obstacles = 0
         for obstacle in self.obstacles:
             if obstacle.performing:
-                performing_obstacles += 1
                 obstacle.draw()
 
         # Draw items
-        performing_items = 0
         for item in self.items:
             if item.performing:
-                performing_items += 1
                 item.draw()
 
         # Draw player
@@ -631,7 +625,6 @@ class PinoySkaterGame(arcade.Window):
             obstacle.x = SCREEN_WIDTH
             obstacle.sprite.center_x = obstacle.x + obstacle.sprite.width / 2
             obstacle.sprite.center_y = obstacle.initial_y + obstacle.sprite.height / 2
-            print(f"Spawned obstacle at x={obstacle.x}, y={obstacle.initial_y}, performing={obstacle.performing}")
 
     def spawn_item(self):
         """Spawn a random item"""
@@ -644,7 +637,6 @@ class PinoySkaterGame(arcade.Window):
             item.x = SCREEN_WIDTH
             item.sprite.center_x = item.x + item.sprite.width / 2
             item.sprite.center_y = item.initial_y + item.sprite.height / 2
-            print(f"Spawned item at x={item.x}, y={item.initial_y}, performing={item.performing}")
 
     def check_collisions(self):
         """Check for collisions between player and objects"""
