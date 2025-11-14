@@ -35,7 +35,7 @@ class AllScenes():
     self.game_over_scene = GameOverScene(self)
 
     # Play the game's soundtract
-    game_music.load("sounds/bg.mp3")
+    game_music.load("sounds/bg.ogg")
     game_music.play(-1)
 
     # Run the start scene

@@ -380,24 +380,34 @@ class PinoySkaterGame:
     def setup_start_screen(self):
         """Setup start screen elements"""
         try:
-            self.start_bg = pygame.image.load("images/StartScreenImage.png").convert()
+            # Load and scale background to match screen size
+            bg_image = pygame.image.load("images/StartScreenImage.png").convert()
+            self.start_bg = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
             self.start_button = pygame.image.load("images/StartButton.png").convert_alpha()
-            # Scale button if needed
+            # Scale button proportionally based on screen size
+            scale_factor = min(SCREEN_WIDTH / 1200, SCREEN_HEIGHT / 700)  # Original design was 1200x700
+            button_scale = scale_factor * 2
             self.start_button = pygame.transform.scale(self.start_button,
-                                                      (int(self.start_button.get_width() * 2),
-                                                       int(self.start_button.get_height() * 2)))
+                                                      (int(self.start_button.get_width() * button_scale),
+                                                       int(self.start_button.get_height() * button_scale)))
             self.start_button_rect = self.start_button.get_rect()
-            self.start_button_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 100)
+            # In Pygame, Y increases downward (opposite of Arcade), so + moves down
+            self.start_button_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + int(100 * scale_factor))
         except pygame.error as e:
             print(f"Warning: Could not load start screen images: {e}")
 
         try:
-            self.instructions_bg = pygame.image.load("images/InstructionsImage.png").convert()
+            # Load and scale instructions background to match screen size
+            inst_image = pygame.image.load("images/InstructionsImage.png").convert()
+            self.instructions_bg = pygame.transform.scale(inst_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
         except pygame.error:
             pass
 
         try:
-            self.gameover_bg = pygame.image.load("images/GameOverScreenImage.png").convert()
+            # Load and scale game over background to match screen size
+            go_image = pygame.image.load("images/GameOverScreenImage.png").convert()
+            self.gameover_bg = pygame.transform.scale(go_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
         except pygame.error:
             pass
 
