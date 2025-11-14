@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinoy Skater</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-title {
+            font-size: 4em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loading-subtitle {
+            font-size: 1.5em;
+            color: #ffd700;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Skateboard loading animation */
+        .skater-container {
+            position: relative;
+            width: 300px;
+            height: 100px;
+            margin-bottom: 30px;
+        }
+
+        .skater {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 20px;
+            animation: skate 2s ease-in-out infinite;
+        }
+
+        .skater::before {
+            content: '🛹';
+            font-size: 40px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes skate {
+            0%, 100% { left: 0; }
+            50% { left: calc(100% - 60px); }
+        }
+
+        .loading-track {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-track::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 215, 0, 0.8),
+                transparent
+            );
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 400px;
+            max-width: 80%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .loading-text {
+            color: #fff;
+            font-size: 1.2em;
+            margin-top: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ready to start button */
+        .ready-button {
+            display: none;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 20px 50px;
+            font-size: 1.8em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        .ready-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .ready-button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Coin decorations */
+        .coin {
+            position: absolute;
+            font-size: 2em;
+            animation: float 3s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .coin:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .coin:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.5s; }
+        .coin:nth-child(3) { bottom: 15%; left: 15%; animation-delay: 1s; }
+        .coin:nth-child(4) { bottom: 10%; right: 10%; animation-delay: 1.5s; }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .loading-title {
+                font-size: 2.5em;
+            }
+
+            .loading-subtitle {
+                font-size: 1.2em;
+            }
+
+            .ready-button {
+                font-size: 1.4em;
+                padding: 15px 35px;
+            }
+
+            .skater-container {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="coin">🪙</div>
+        <div class="coin">🍬</div>
+        <div class="coin">🪙</div>
+        <div class="coin">❤️</div>
+
+        <h1 class="loading-title">🛹 PINOY SKATER</h1>
+        <p class="loading-subtitle">Get Ready to Ride!</p>
+
+        <div class="skater-container">
+            <div class="skater"></div>
+            <div class="loading-track"></div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <p class="loading-text" id="loading-text">Loading game assets...</p>
+
+        <button class="ready-button" id="ready-button" onclick="startGame()">
+            🎮 CLICK TO START! 🎮
+        </button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        let progress = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const loadingText = document.getElementById('loading-text');
+        const readyButton = document.getElementById('ready-button');
+        const loadingScreen = document.getElementById('loading-screen');
+        const canvas = document.getElementById('canvas');
+
+        const loadingMessages = [
+            'Loading game assets...',
+            'Preparing the skateboard...',
+            'Setting up the streets...',
+            'Loading obstacles...',
+            'Almost there...',
+            'Ready to skate!'
+        ];
+
+        let messageIndex = 0;
+
+        // Simulate loading progress
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                progressBar.style.width = '100%';
+                loadingText.textContent = loadingMessages[loadingMessages.length - 1];
+                clearInterval(loadingInterval);
+
+                // Show ready button after a short delay
+                setTimeout(() => {
+                    loadingText.style.display = 'none';
+                    readyButton.style.display = 'block';
+                }, 500);
+            } else {
+                progressBar.style.width = progress + '%';
+                messageIndex = Math.min(Math.floor(progress / 20), loadingMessages.length - 2);
+                loadingText.textContent = loadingMessages[messageIndex];
+            }
+        }, 300);
+
+        function startGame() {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                canvas.style.display = 'block';
+                // Initialize Pygame/Pygbag here
+                if (window.pygbag) {
+                    window.pygbag.start();
+                }
+            }, 500);
+        }
+
+        // Listen for pygbag ready event
+        window.addEventListener('load', () => {
+            // Check if game is actually ready
+            const checkReady = setInterval(() => {
+                if (document.querySelector('canvas').style.display !== 'none' || progress >= 100) {
+                    clearInterval(checkReady);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

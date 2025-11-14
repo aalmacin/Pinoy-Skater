@@ -27,6 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pygbag
+        run: pip install pygbag
+
+      - name: Build game with pygbag
+        run: pygbag --build .
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
@@ -35,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'build/web'
 
       - name: Deploy to GitHub Pages
         id: deployment
