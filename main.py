@@ -108,7 +108,7 @@ class GameObject:
 class Obstacle(GameObject):
     """Obstacle that damages the player"""
 
-    def __init__(self, image_path: str, y: float, sound_path: Optional[str] = None):
+    def __init__(self, image_path: str, y: float, sound_path: Optional[str] = None, is_rock: bool = False):
         super().__init__(image_path, y)
         self.sound = None
         if sound_path:
@@ -116,6 +116,37 @@ class Obstacle(GameObject):
                 self.sound = pygame.mixer.Sound(sound_path)
             except pygame.error as e:
                 print(f"Warning: Could not load sound {sound_path}: {e}")
+
+        # For scaling rocks over time
+        self.is_rock = is_rock
+        self.original_image = self.image.copy()  # Keep original for scaling
+        self.scale_factor = 0.5 if is_rock else 1.0  # Rocks start at 50% size
+
+        # Apply initial scale for rocks
+        if is_rock:
+            new_width = int(self.original_image.get_width() * self.scale_factor)
+            new_height = int(self.original_image.get_height() * self.scale_factor)
+            self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
+            # Update rect with new size
+            self.rect = self.image.get_rect()
+            self.rect.left = self.x
+            self.rect.bottom = SCREEN_HEIGHT - y
+
+    def set_scale(self, scale_factor: float):
+        """Scale the obstacle image"""
+        if self.is_rock:
+            self.scale_factor = scale_factor
+            # Scale the original image
+            new_width = int(self.original_image.get_width() * scale_factor)
+            new_height = int(self.original_image.get_height() * scale_factor)
+            self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
+
+            # Update rect size but maintain position
+            old_bottom = self.rect.bottom
+            old_left = self.rect.left
+            self.rect = self.image.get_rect()
+            self.rect.left = old_left
+            self.rect.bottom = old_bottom
 
     def play_sound(self):
         """Play hit sound"""
@@ -462,15 +493,15 @@ class PinoySkaterGame:
         # Create obstacles pool
         self.obstacles = []
         try:
-            # Rocks
+            # Rocks - start small and grow to full size after 3 minutes
             for _ in range(5):
                 self.obstacles.append(
-                    Obstacle("images/Rock.png", BOTTOM_Y, "sounds/ouch.ogg")
+                    Obstacle("images/Rock.png", BOTTOM_Y, "sounds/ouch.ogg", is_rock=True)
                 )
-            # Birds
+            # Birds - always full size
             for _ in range(5):
                 self.obstacles.append(
-                    Obstacle("images/Bird.png", TOP_Y, "sounds/ouch.ogg")
+                    Obstacle("images/Bird.png", TOP_Y, "sounds/ouch.ogg", is_rock=False)
                 )
         except Exception as e:
             print(f"Warning: Could not create obstacles: {e}")
@@ -603,6 +634,16 @@ class PinoySkaterGame:
         # Update speed multiplier
         self.speed_multiplier = 1.0 + (int(self.time_elapsed / SPEED_INCREASE_INTERVAL) * 0.5)
 
+        # Update rock scale - for the first minute, all rocks grow uniformly
+        # After 1 minute, rocks spawn with random sizes (set in spawn_obstacle)
+        if self.time_elapsed < 60.0:
+            # First minute: gradually grow from 50% to 100%
+            rock_scale_progress = min(self.time_elapsed / 60.0, 1.0)  # 60 seconds = 1 minute
+            rock_scale = 0.5 + (rock_scale_progress * 0.5)  # Scale from 0.5 to 1.0
+            for obstacle in self.obstacles:
+                if obstacle.is_rock:
+                    obstacle.set_scale(rock_scale)
+
         # Update parallax layers
         self.parallax_timer += delta_time
         if self.parallax_timer >= 0.1:
@@ -675,6 +716,11 @@ class PinoySkaterGame:
             obstacle.rect.left = obstacle.x
             # Convert from Arcade (bottom-origin) to Pygame (top-origin)
             obstacle.rect.bottom = SCREEN_HEIGHT - obstacle.initial_y
+
+            # After 1 minute, assign random size to rocks for variety
+            if obstacle.is_rock and self.time_elapsed >= 60.0:
+                random_scale = random.uniform(0.5, 1.0)  # Random size between 50% and 100%
+                obstacle.set_scale(random_scale)
 
     def spawn_item(self):
         """Spawn a random item"""
